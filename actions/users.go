@@ -36,24 +36,9 @@ func UsersCreate(c buffalo.Context) error {
 		return c.Render(http.StatusExpectationFailed, r.JSON(verrs))
 	}
 
-	return c.Render(http.StatusCreated, r.JSON())
-}
-
-// SetCurrentUser attempts to find a user based on the current_user_id
-// in the session. If one is found it is set on the context.
-func SetCurrentUser(next buffalo.Handler) buffalo.Handler {
-	return func(c buffalo.Context) error {
-		if uid := c.Session().Get("current_user_id"); uid != nil {
-			u := &models.User{}
-			tx := c.Value("tx").(*pop.Connection)
-			err := tx.Find(u, uid)
-			if err != nil {
-				return errors.WithStack(err)
-			}
-			c.Set("current_user", u)
-		}
-		return next(c)
-	}
+	return c.Render(http.StatusCreated, r.JSON(map[string]string{
+    "token": "token"
+    }))
 }
 
 // Authorize require a user be logged in before accessing a route

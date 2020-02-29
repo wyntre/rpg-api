@@ -58,13 +58,33 @@ func AuthCreate(c buffalo.Context) error {
 		return bad()
 	}
 
-	return c.Render(http.StatusAccepted, r.JSON())
+	return c.Render(http.StatusAccepted, r.JSON(map[string]string{
+    "token": "token"
+    }))
 }
 
 // AuthDestroy clears the session and logs a user out
 // HTTP Method: DELETE
+// Expected Data:
+//  Header: Authorization
+//
+// Return:
+//  417 with verrs
+//  202
 func AuthDestroy(c buffalo.Context) error {
-	c.Session().Clear()
-	c.Flash().Add("success", "You have been logged out!")
-	return c.Redirect(302, "/")
+	token := &models.Revokedtoken{}
+
+  tx := c.Value("tx").(*pop.Connection)
+  verrs, err := token.Create(tx)
+	if err != nil {
+		return errors.WithStack(err)
+	}
+
+  if verrs.HasAny() {
+		return c.Render(http.StatusExpectationFailed, r.JSON(verrs))
+	}
+
+  return c.Render(http.StatusAccepted, r.JSON(map[string]string{
+    "message": "token invalidated"
+    }))
 }

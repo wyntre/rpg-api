@@ -1,0 +1,5 @@
+create_table("revokedtokens") {
+	t.Column("id", "uuid", {primary: true})
+	t.Column("token", "string", {})
+	t.Timestamps()
+}

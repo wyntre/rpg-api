@@ -59,7 +59,6 @@ func App() *buffalo.App {
 
 		app.GET("/", HomeHandler)
 		//AuthMiddlewares
-		app.Use(SetCurrentUser)
 		app.Use(Authorize)
 
     //define API version
@@ -69,13 +68,12 @@ func App() *buffalo.App {
 		auth := v1.Group("/auth")
 		auth.POST("/", AuthCreate)
 		auth.DELETE("/", AuthDestroy)
-		auth.Middleware.Skip(Authorize, AuthLanding, AuthNew, AuthCreate)
+		auth.Middleware.Skip(Authorize, AuthCreate)
 
 		//Routes for User registration
 		users := v1.Group("/users")
 		users.POST("/", UsersCreate)
 		users.Middleware.Remove(Authorize)
-
 	}
 
 	return app
