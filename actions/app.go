@@ -62,17 +62,17 @@ func App() *buffalo.App {
 		app.Use(SetCurrentUser)
 		app.Use(Authorize)
 
-		//Routes for Auth
-		auth := app.Group("/auth")
-		auth.GET("/", AuthLanding)
-		auth.GET("/new", AuthNew)
+    //define API version
+    v1 := app.group("/v1")
+
+    //Routes for Auth
+		auth := v1.Group("/auth")
 		auth.POST("/", AuthCreate)
 		auth.DELETE("/", AuthDestroy)
 		auth.Middleware.Skip(Authorize, AuthLanding, AuthNew, AuthCreate)
 
 		//Routes for User registration
-		users := app.Group("/users")
-		users.GET("/new", UsersNew)
+		users := v1.Group("/users")
 		users.POST("/", UsersCreate)
 		users.Middleware.Remove(Authorize)
 

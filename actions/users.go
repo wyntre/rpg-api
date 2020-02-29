@@ -1,20 +1,25 @@
 package actions
 
 import (
+  "net/http"
 	"github.com/gobuffalo/buffalo"
 	"github.com/gobuffalo/pop"
 	"github.com/pkg/errors"
 	"github.com/wyntre/rpg_api/models"
 )
 
-//UsersNew renders the users form
-func UsersNew(c buffalo.Context) error {
-	u := models.User{}
-	c.Set("user", u)
-	return c.Render(200, r.HTML("users/new.plush.html"))
-}
-
 // UsersCreate registers a new user with the application.
+// HTTP Method: POST
+// Expected Data:
+//   JSON Object:
+//    {
+//      "email": string,
+//      "password": string
+//    }
+//
+// Return:
+//  401 with verrs
+//  201 with JWT token
 func UsersCreate(c buffalo.Context) error {
 	u := &models.User{}
 	if err := c.Bind(u); err != nil {
@@ -28,15 +33,10 @@ func UsersCreate(c buffalo.Context) error {
 	}
 
 	if verrs.HasAny() {
-		c.Set("user", u)
-		c.Set("errors", verrs)
-		return c.Render(200, r.HTML("users/new.plush.html"))
+		return c.Render(http.StatusExpectationFailed, r.JSON(verrs))
 	}
 
-	c.Session().Set("current_user_id", u.ID)
-	c.Flash().Add("success", "Welcome to Buffalo!")
-
-	return c.Redirect(302, "/")
+	return c.Render(http.StatusCreated, r.JSON())
 }
 
 // SetCurrentUser attempts to find a user based on the current_user_id
