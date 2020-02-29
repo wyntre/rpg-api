@@ -1,5 +1,9 @@
 KEY_NAME="jwtRS256"
-PUB_KEY=$(pwd)/$KEY_NAME.key.pub
+echo "KEY_NAME=$KEY_NAME"
+PWD=$(pwd)
+echo "PWD=$PWD"
+PUB_KEY="$PWD/$KEY_NAME.key.pub"
+echo "PUB_KEY=$PUB_KEY"
 
 if [[ ! -f "$PUB_KEY" ]]; then
   echo "generating key..."
@@ -7,4 +11,6 @@ if [[ ! -f "$PUB_KEY" ]]; then
 fi
 
 echo "setting key env variable (JWT_PUBLIC_KEY)..."
-export JWT_PUBLIC_KEY=$(pwd)/$KEY_NAME.key.pub
+JWT_PUBLIC_KEY="$PWD/$KEY_NAME.key.pub"
+echo "JWT_PUBLIC_KEY=$JWT_PUBLIC_KEY"
+export JWT_PUBLIC_KEY

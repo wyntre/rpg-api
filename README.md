@@ -16,6 +16,13 @@ Ok, so you've edited the "database.yml" file and started your database, now Buff
 
 	$ buffalo pop create -a
 
+## JWT Signing Key Setup
+
+```
+$ cd keys/
+$ . gen_keys.sh
+```
+
 ## Starting the Application
 
 Buffalo ships with a command that will watch your application and automatically rebuild the Go binary and any assets for you. To do that run the "buffalo dev" command:
