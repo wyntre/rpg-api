@@ -59,7 +59,7 @@ func AuthCreate(c buffalo.Context) error {
 	}
 
 	return c.Render(http.StatusAccepted, r.JSON(map[string]string{
-    "token": "token"
+    "token": "token",
     }))
 }
 
@@ -85,6 +85,6 @@ func AuthDestroy(c buffalo.Context) error {
 	}
 
   return c.Render(http.StatusAccepted, r.JSON(map[string]string{
-    "message": "token invalidated"
+    "message": "token invalidated",
     }))
 }

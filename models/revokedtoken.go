@@ -10,8 +10,8 @@ import (
 )
 // Revokedtoken is used by pop to map your .model.Name.Proper.Pluralize.Underscore database table to your go code.
 type Revokedtoken struct {
-    ID uuid.UUID `json:"id" db:"id"`
-    Token string `json:"token" db:"token"`
+    ID 				uuid.UUID `json:"id" db:"id"`
+    Token 		string 		`json:"token" db:"token"`
     CreatedAt time.Time `json:"created_at" db:"created_at"`
     UpdatedAt time.Time `json:"updated_at" db:"updated_at"`
 }

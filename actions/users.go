@@ -38,7 +38,7 @@ func UsersCreate(c buffalo.Context) error {
 	}
 
 	return c.Render(http.StatusCreated, r.JSON(map[string]string{
-    "token": "token"
+    "token": "token",
     }))
 }
 
@@ -54,8 +54,9 @@ func Authorize(next buffalo.Handler) buffalo.Handler {
 			}
 
 			return c.Render(http.StatusUnauthorized, r.JSON(map[string]string{
-          "message": "unauthoried access"
+          "message": "unauthoried access",
         }))
+    }
 		return next(c)
 	}
 }
