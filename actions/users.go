@@ -33,7 +33,8 @@ func UsersCreate(c buffalo.Context) error {
 	}
 
 	if verrs.HasAny() {
-		return c.Render(http.StatusExpectationFailed, r.JSON(verrs))
+    c.set("errors") = verrs
+		return c.Error(http.StatusConflict, error.New(verrs.Error()))
 	}
 
 	return c.Render(http.StatusCreated, r.JSON(map[string]string{
@@ -52,9 +53,9 @@ func Authorize(next buffalo.Handler) buffalo.Handler {
 				return errors.WithStack(err)
 			}
 
-			c.Flash().Add("danger", "You must be authorized to see that page")
-			return c.Redirect(302, "/auth/new")
-		}
+			return c.Render(http.StatusUnauthorized, r.JSON(map[string]string{
+          "message": "unauthoried access"
+        }))
 		return next(c)
 	}
 }
