@@ -33,17 +33,6 @@ import (
 func AuthCreate(c buffalo.Context) error {
 	u := &models.User{}
 
-	privateKey := envy.Get("JWT_PRIVATE_KEY", "keys/rsakey.pem")
-	key, err := ioutil.ReadFile(privateKey)
-	if err != nil {
-		return errors.WithStack(err)
-	}
-
-	parsedKey, err := jwt.ParseRSAPrivateKeyFromPEM(key)
-	if err != nil {
-		return errors.Wrap(err, "error parsing key")
-	}
-
 	if err := c.Bind(u); err != nil {
 		return errors.WithStack(err)
 	}
@@ -51,7 +40,7 @@ func AuthCreate(c buffalo.Context) error {
 	tx := c.Value("tx").(*pop.Connection)
 
 	// find a user with the email
-	err = tx.Where("email = ?", strings.ToLower(strings.TrimSpace(u.Email))).First(u)
+	err := tx.Where("email = ?", strings.ToLower(strings.TrimSpace(u.Email))).First(u)
 
 	// helper function to handle bad attempts
 	bad := func() error {
@@ -75,11 +64,10 @@ func AuthCreate(c buffalo.Context) error {
 		return bad()
 	}
 
-	token := jwt.NewWithClaims(jwt.SigningMethodRS256, jwt.MapClaims{
-		"id": u.ID,
-		"exp": time.Now().Add(-time.Hour * 2).Unix(),
-	})
-	signedToken, _ := token.SignedString(parsedKey)
+	signedToken, err := AuthGenerateToken(u)
+	if err != nil {
+		return err
+	}
 
 	return c.Render(http.StatusAccepted, r.JSON(map[string]string{
     "token": fmt.Sprintf("Bearer %s", signedToken),
@@ -96,7 +84,10 @@ func AuthCreate(c buffalo.Context) error {
 //  202
 func AuthDestroy(c buffalo.Context) error {
 	token := &models.Revokedtoken{}
-	token.Token = strings.Replace((c.Request().Header.Get("Authorization")),"Bearer ", "", 1)
+	token.Token = strings.Split(
+		c.Request().Header.Get("Authorization"),
+		"Bearer ",
+	)[1]
 
   tx := c.Value("tx").(*pop.Connection)
   verrs, err := token.Create(tx)
@@ -111,4 +102,25 @@ func AuthDestroy(c buffalo.Context) error {
   return c.Render(http.StatusAccepted, r.JSON(map[string]string{
     "message": "token invalidated",
     }))
+}
+
+func AuthGenerateToken(u *models.User) (string, error) {
+	privateKey := envy.Get("JWT_PRIVATE_KEY", "keys/rsakey.pem")
+	key, err := ioutil.ReadFile(privateKey)
+	if err != nil {
+		return "", errors.WithStack(err)
+	}
+
+	parsedKey, err := jwt.ParseRSAPrivateKeyFromPEM(key)
+	if err != nil {
+		return "", errors.Wrap(err, "error parsing key")
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodRS256, jwt.MapClaims{
+		"id": u.ID,
+		"exp": time.Now().Add(time.Hour * 2).Unix(),
+	})
+	signedToken, _ := token.SignedString(parsedKey)
+
+	return signedToken, nil
 }

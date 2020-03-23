@@ -67,8 +67,6 @@ func App() *buffalo.App {
 		app.Use(popmw.Transaction(models.DB))
 
 		app.GET("/", HomeHandler)
-		//AuthMiddlewares
-		//app.Use(Authorize)
 
     //define API version
     v1 := app.Group("/v1")
@@ -84,6 +82,12 @@ func App() *buffalo.App {
 		users := v1.Group("/users")
 		users.POST("/", UsersCreate)
 		users.Middleware.Remove(TokenAuthentication)
+
+		// Routers for Characters
+		characters := v1.Group("/characters")
+		characters.GET("/", CharactersList)
+		characters.POST("/new", CharactersCreate)
+		characters.GET("/{id}", CharactersShow)
 	}
 
 	return app

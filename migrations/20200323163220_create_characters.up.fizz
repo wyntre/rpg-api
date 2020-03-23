@@ -1,0 +1,8 @@
+create_table("characters") {
+	t.Column("id", "uuid", {primary: true})
+	t.Column("user_id", "uuid", {})
+	t.Column("name", "string", {})
+	t.Column("description", "text", {})
+	t.ForeignKey("user_id", {"users": ["id"]}, {})
+	t.Timestamps()
+}

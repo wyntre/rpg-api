@@ -21,12 +21,28 @@ SET default_tablespace = '';
 SET default_table_access_method = heap;
 
 --
+-- Name: characters; Type: TABLE; Schema: public; Owner: buffalo
+--
+
+CREATE TABLE public.characters (
+    id uuid NOT NULL,
+    user_id uuid NOT NULL,
+    name character varying(255) NOT NULL,
+    description text NOT NULL,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+ALTER TABLE public.characters OWNER TO buffalo;
+
+--
 -- Name: revokedtokens; Type: TABLE; Schema: public; Owner: buffalo
 --
 
 CREATE TABLE public.revokedtokens (
     id uuid NOT NULL,
-    token character varying(255) NOT NULL,
+    token character varying(1000) NOT NULL,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
@@ -61,6 +77,14 @@ CREATE TABLE public.users (
 ALTER TABLE public.users OWNER TO buffalo;
 
 --
+-- Name: characters characters_pkey; Type: CONSTRAINT; Schema: public; Owner: buffalo
+--
+
+ALTER TABLE ONLY public.characters
+    ADD CONSTRAINT characters_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: revokedtokens revokedtokens_pkey; Type: CONSTRAINT; Schema: public; Owner: buffalo
 --
 
@@ -81,6 +105,14 @@ ALTER TABLE ONLY public.users
 --
 
 CREATE UNIQUE INDEX schema_migration_version_idx ON public.schema_migration USING btree (version);
+
+
+--
+-- Name: characters characters_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: buffalo
+--
+
+ALTER TABLE ONLY public.characters
+    ADD CONSTRAINT characters_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id);
 
 
 --

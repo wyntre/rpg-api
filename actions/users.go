@@ -1,8 +1,8 @@
 package actions
 
 import (
+  "fmt"
   "net/http"
-  "strings"
 	"github.com/gobuffalo/buffalo"
 	"github.com/gobuffalo/pop"
 	"github.com/pkg/errors"
@@ -38,31 +38,12 @@ func UsersCreate(c buffalo.Context) error {
 		return c.Error(http.StatusConflict, errors.New(verrs.Error()))
 	}
 
+  signedToken, err := AuthGenerateToken(u)
+  if err != nil {
+    return err
+  }
+
 	return c.Render(http.StatusCreated, r.JSON(map[string]string{
-    "token": "token",
+    "token": fmt.Sprintf("Bearer %s", signedToken),
     }))
-}
-
-// Authorize require a user be logged in before accessing a route
-func Authorize(next buffalo.Handler) buffalo.Handler {
-	return func(c buffalo.Context) error {
-    // get Authorization header, strip out Bearer and check if empty
-		if token := strings.Replace(c.Request().Header.Get("Authorization"), "Bearer ", "", 1); token == "" {
-			return c.Render(http.StatusUnauthorized, r.JSON(map[string]string{
-          "message": "unauthoried access",
-        }))
-    // if not empty, see if the token has been revoked
-    } else {
-      t := &models.Revokedtoken{}
-      tx := c.Value("tx").(*pop.Connection)
-
-      if err := tx.Where("token = ?", token).First(t); err != nil {
-        return c.Render(http.StatusUnauthorized, r.JSON(map[string]string{
-            "message": "unauthoried access",
-          }))
-      }
-    }
-    // if not empty and not revoked, validate token
-		return next(c)
-	}
 }
