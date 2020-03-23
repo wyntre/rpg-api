@@ -62,7 +62,7 @@ func App() *buffalo.App {
 		app.Use(Authorize)
 
     //define API version
-    v1 := app.group("/v1")
+    v1 := app.Group("/v1")
 
     //Routes for Auth
 		auth := v1.Group("/auth")

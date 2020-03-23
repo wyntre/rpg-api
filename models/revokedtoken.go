@@ -16,6 +16,10 @@ type Revokedtoken struct {
     UpdatedAt time.Time `json:"updated_at" db:"updated_at"`
 }
 
+func (t *Revokedtoken) Create(tx *pop.Connection) (*validate.Errors, error) {
+	return tx.ValidateAndCreate(t)
+}
+
 // String is not required by pop and may be deleted
 func (r Revokedtoken) String() string {
 	jr, _ := json.Marshal(r)
@@ -34,9 +38,27 @@ func (r Revokedtokens) String() string {
 // Validate gets run every time you call a "pop.Validate*" (pop.ValidateAndSave, pop.ValidateAndCreate, pop.ValidateAndUpdate) method.
 // This method is not required and may be deleted.
 func (r *Revokedtoken) Validate(tx *pop.Connection) (*validate.Errors, error) {
+	var err error
 	return validate.Validate(
 		&validators.StringIsPresent{Field: r.Token, Name: "Token"},
-	), nil
+		&validators.FuncValidator{
+			Field:   r.Token,
+			Name:    "Token",
+			Message: "%s is already revoked",
+			Fn: func() bool {
+				var b bool
+				q := tx.Where("token = ?", r.Token)
+				if r.ID != uuid.Nil {
+					q = q.Where("id != ?", r.ID)
+				}
+				b, err = q.Exists(r)
+				if err != nil {
+					return false
+				}
+				return !b
+			},
+		},
+	), err
 }
 
 // ValidateCreate gets run every time you call "pop.ValidateAndCreate" method.

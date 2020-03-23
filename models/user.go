@@ -20,8 +20,8 @@ type User struct {
 	UpdatedAt    					time.Time `json:"updated_at" db:"updated_at"`
 	Email        					string    `json:"email" db:"email"`
 	PasswordHash 					string    `json:"password_hash" db:"password_hash"`
-	Password             	string 		`json:"-" db:"-"`
-	PasswordConfirmation 	string		`json:"-" db:"-"`
+	Password             	string 		`json:"password" db:"-"`
+	PasswordConfirmation 	string		`json:"password_confirmation" db:"-"`
 }
 
 // Create wraps up the pattern of encrypting the password and
@@ -57,7 +57,7 @@ func (u *User) Validate(tx *pop.Connection) (*validate.Errors, error) {
 	var err error
 	return validate.Validate(
 		&validators.StringIsPresent{Field: u.Email, Name: "Email"},
-    &validators.EmailIsPreset{Field: u.Email, Name: "Email", Message: "Incorrect email format"},
+    &validators.EmailIsPresent{Field: u.Email, Name: "Email", Message: "Incorrect email format"},
 		&validators.StringIsPresent{Field: u.PasswordHash, Name: "PasswordHash"},
 		// check to see if the email address is already taken:
 		&validators.FuncValidator{

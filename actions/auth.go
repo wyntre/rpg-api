@@ -41,7 +41,7 @@ func AuthCreate(c buffalo.Context) error {
 		verrs := validate.NewErrors()
 		verrs.Add("email", "invalid email/password")
 
-		return c.Render(http.StatusUnauthorized, r.JSON(verrs))
+		return c.Error(http.StatusUnauthorized, errors.New(verrs.Error()))
 	}
 
 	if err != nil {
@@ -73,6 +73,7 @@ func AuthCreate(c buffalo.Context) error {
 //  202
 func AuthDestroy(c buffalo.Context) error {
 	token := &models.Revokedtoken{}
+	token.Token = c.Request().Header.Get("Authorization")
 
   tx := c.Value("tx").(*pop.Connection)
   verrs, err := token.Create(tx)
@@ -81,7 +82,7 @@ func AuthDestroy(c buffalo.Context) error {
 	}
 
   if verrs.HasAny() {
-		return c.Render(http.StatusExpectationFailed, r.JSON(verrs))
+		return c.Error(http.StatusExpectationFailed, errors.New(verrs.Error()))
 	}
 
   return c.Render(http.StatusAccepted, r.JSON(map[string]string{
