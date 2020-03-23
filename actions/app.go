@@ -12,6 +12,8 @@ import (
 	"github.com/gobuffalo/x/sessions"
 	"github.com/rs/cors"
 	"github.com/wyntre/rpg_api/models"
+	"github.com/gobuffalo/mw-tokenauth"
+	"github.com/dgrijalva/jwt-go"
 )
 
 // ENV is used to help switch settings based on where the
@@ -46,6 +48,13 @@ func App() *buffalo.App {
 		// Automatically redirect to SSL
 		app.Use(forceSSL())
 
+		// Setup JWT
+		envy.Set("JWT_PUBLIC_KEY", "keys/rsapub.pem")
+		TokenAuthentication := tokenauth.New(tokenauth.Options{
+			SignMethod: jwt.SigningMethodRS256,
+		})
+		app.Use(TokenAuthentication)
+
 		// Log request parameters (filters apply).
 		app.Use(paramlogger.ParameterLogger)
 
@@ -59,7 +68,7 @@ func App() *buffalo.App {
 
 		app.GET("/", HomeHandler)
 		//AuthMiddlewares
-		app.Use(Authorize)
+		//app.Use(Authorize)
 
     //define API version
     v1 := app.Group("/v1")
@@ -68,12 +77,13 @@ func App() *buffalo.App {
 		auth := v1.Group("/auth")
 		auth.POST("/", AuthCreate)
 		auth.DELETE("/", AuthDestroy)
-		auth.Middleware.Skip(Authorize, AuthCreate)
+		// auth.Middleware.Skip(Authorize, AuthCreate)
+		auth.Middleware.Skip(TokenAuthentication, AuthCreate)
 
 		//Routes for User registration
 		users := v1.Group("/users")
 		users.POST("/", UsersCreate)
-		users.Middleware.Remove(Authorize)
+		users.Middleware.Remove(TokenAuthentication)
 	}
 
 	return app

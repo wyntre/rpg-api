@@ -1,9 +1,12 @@
 package actions
 
 import (
+	"fmt"
 	"database/sql"
 	"net/http"
 	"strings"
+	"time"
+	"io/ioutil"
 
 	"github.com/gobuffalo/buffalo"
 	"github.com/gobuffalo/pop"
@@ -11,6 +14,8 @@ import (
 	"github.com/pkg/errors"
 	"github.com/wyntre/rpg_api/models"
 	"golang.org/x/crypto/bcrypt"
+	"github.com/dgrijalva/jwt-go"
+	"github.com/gobuffalo/envy"
 )
 
 // AuthCreate attempts to log the user in with an existing account.
@@ -27,6 +32,18 @@ import (
 //  202 with JWT token
 func AuthCreate(c buffalo.Context) error {
 	u := &models.User{}
+
+	privateKey := envy.Get("JWT_PRIVATE_KEY", "keys/rsakey.pem")
+	key, err := ioutil.ReadFile(privateKey)
+	if err != nil {
+		return errors.WithStack(err)
+	}
+
+	parsedKey, err := jwt.ParseRSAPrivateKeyFromPEM(key)
+	if err != nil {
+		return errors.Wrap(err, "error parsing key")
+	}
+
 	if err := c.Bind(u); err != nil {
 		return errors.WithStack(err)
 	}
@@ -34,7 +51,7 @@ func AuthCreate(c buffalo.Context) error {
 	tx := c.Value("tx").(*pop.Connection)
 
 	// find a user with the email
-	err := tx.Where("email = ?", strings.ToLower(strings.TrimSpace(u.Email))).First(u)
+	err = tx.Where("email = ?", strings.ToLower(strings.TrimSpace(u.Email))).First(u)
 
 	// helper function to handle bad attempts
 	bad := func() error {
@@ -58,8 +75,14 @@ func AuthCreate(c buffalo.Context) error {
 		return bad()
 	}
 
+	token := jwt.NewWithClaims(jwt.SigningMethodRS256, jwt.MapClaims{
+		"id": u.ID,
+		"exp": time.Now().Add(-time.Hour * 2).Unix(),
+	})
+	signedToken, _ := token.SignedString(parsedKey)
+
 	return c.Render(http.StatusAccepted, r.JSON(map[string]string{
-    "token": "token",
+    "token": fmt.Sprintf("Bearer %s", signedToken),
     }))
 }
 
@@ -73,7 +96,7 @@ func AuthCreate(c buffalo.Context) error {
 //  202
 func AuthDestroy(c buffalo.Context) error {
 	token := &models.Revokedtoken{}
-	token.Token = c.Request().Header.Get("Authorization")
+	token.Token = strings.Replace((c.Request().Header.Get("Authorization")),"Bearer ", "", 1)
 
   tx := c.Value("tx").(*pop.Connection)
   verrs, err := token.Create(tx)

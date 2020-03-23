@@ -25,5 +25,4 @@ dist/
 generated/
 .vendor/
 
-keys/*.key
-keys/*.key.pub
+keys/*.pem
