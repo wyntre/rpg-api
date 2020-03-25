@@ -36,11 +36,17 @@ var app *buffalo.App
 // declared after it to never be called.
 func App() *buffalo.App {
 	if app == nil {
+		corsHandler := cors.New(cors.Options{
+			AllowedOrigins: []string{"http://localhost*"},
+			AllowedMethods: []string{"GET", "POST", "PUT", "DELETE"},
+			AllowedHeaders: []string{"Authorization", "Content-Type"},
+		})
+
 		app = buffalo.New(buffalo.Options{
 			Env:          ENV,
 			SessionStore: sessions.Null{},
 			PreWares: []buffalo.PreWare{
-				cors.Default().Handler,
+				corsHandler.Handler,
 			},
 			SessionName: "_rpg_api_session",
 		})
@@ -88,6 +94,8 @@ func App() *buffalo.App {
 		characters.GET("/", CharactersList)
 		characters.POST("/new", CharactersCreate)
 		characters.GET("/{id}", CharactersShow)
+		characters.PUT("/{id}", CharactersUpdate)
+		characters.DELETE("/{id}", CharactersDestroy)
 	}
 
 	return app
