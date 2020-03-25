@@ -42,7 +42,7 @@ ALTER TABLE public.characters OWNER TO buffalo;
 
 CREATE TABLE public.revokedtokens (
     id uuid NOT NULL,
-    token character varying(1000) NOT NULL,
+    token text NOT NULL,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
