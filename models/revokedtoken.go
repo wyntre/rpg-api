@@ -44,7 +44,7 @@ func (r *Revokedtoken) Validate(tx *pop.Connection) (*validate.Errors, error) {
 		&validators.FuncValidator{
 			Field:   r.Token,
 			Name:    "Token",
-			Message: "%s is already revoked",
+			Message: "Token is already revoked",
 			Fn: func() bool {
 				var b bool
 				q := tx.Where("token = ?", r.Token)
