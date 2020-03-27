@@ -104,8 +104,6 @@ func CharactersList(c buffalo.Context) error {
     return c.Error(http.StatusNotFound, errors.New("characters not found"))
   }
 
-  c.Logger().Info(user)
-
   return c.Render(http.StatusOK, r.JSON(map[string]models.Characters{
     "characters": user.Characters,
     }))
