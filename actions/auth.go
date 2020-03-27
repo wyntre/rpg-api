@@ -34,7 +34,7 @@ func AuthCreate(c buffalo.Context) error {
 	u := &models.User{}
 
 	if err := c.Bind(u); err != nil {
-		return errors.WithStack(err)
+		return c.Error(http.StatusUnprocessableEntity, errors.New("incorrect auth fields"))
 	}
 
 	tx := c.Value("tx").(*pop.Connection)
@@ -55,7 +55,7 @@ func AuthCreate(c buffalo.Context) error {
 			// couldn't find an user with the supplied email address.
 			return bad()
 		}
-		return errors.WithStack(err)
+		return c.Error(http.StatusInternalServerError, errors.New(err))
 	}
 
 	// confirm that the given password matches the hashed password from the db
@@ -66,7 +66,7 @@ func AuthCreate(c buffalo.Context) error {
 
 	signedToken, err := AuthGenerateToken(u)
 	if err != nil {
-		return err
+		return c.Error(http.StatusInternalServerError, err)
 	}
 
 	return c.Render(http.StatusAccepted, r.JSON(map[string]string{
@@ -92,7 +92,7 @@ func AuthDestroy(c buffalo.Context) error {
   tx := c.Value("tx").(*pop.Connection)
   verrs, err := token.Create(tx)
 	if err != nil {
-		return errors.WithStack(err)
+		return c.Error(http.StatusInternalServerError, errors.New("could not invalidate token"))
 	}
 
   if verrs.HasAny() {
@@ -108,19 +108,22 @@ func AuthGenerateToken(u *models.User) (string, error) {
 	privateKey := envy.Get("JWT_PRIVATE_KEY", "keys/rsakey.pem")
 	key, err := ioutil.ReadFile(privateKey)
 	if err != nil {
-		return "", errors.WithStack(err)
+		return "", errors.New("could not read key file")
 	}
 
 	parsedKey, err := jwt.ParseRSAPrivateKeyFromPEM(key)
 	if err != nil {
-		return "", errors.Wrap(err, "error parsing key")
+		return "", errors.New("error parsing key")
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodRS256, jwt.MapClaims{
 		"id": u.ID,
 		"exp": time.Now().Add(time.Hour * 2).Unix(),
 	})
-	signedToken, _ := token.SignedString(parsedKey)
+	signedToken, err := token.SignedString(parsedKey)
+	if err != nil {
+		return "", err
+	}
 
 	return signedToken, nil
 }
