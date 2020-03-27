@@ -21,6 +21,22 @@ SET default_tablespace = '';
 SET default_table_access_method = heap;
 
 --
+-- Name: campaigns; Type: TABLE; Schema: public; Owner: buffalo
+--
+
+CREATE TABLE public.campaigns (
+    id uuid NOT NULL,
+    name character varying(255) NOT NULL,
+    description character varying(255) NOT NULL,
+    user_id uuid NOT NULL,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+ALTER TABLE public.campaigns OWNER TO buffalo;
+
+--
 -- Name: characters; Type: TABLE; Schema: public; Owner: buffalo
 --
 
@@ -75,6 +91,14 @@ CREATE TABLE public.users (
 
 
 ALTER TABLE public.users OWNER TO buffalo;
+
+--
+-- Name: campaigns campaigns_pkey; Type: CONSTRAINT; Schema: public; Owner: buffalo
+--
+
+ALTER TABLE ONLY public.campaigns
+    ADD CONSTRAINT campaigns_pkey PRIMARY KEY (id);
+
 
 --
 -- Name: characters characters_pkey; Type: CONSTRAINT; Schema: public; Owner: buffalo
