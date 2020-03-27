@@ -55,7 +55,7 @@ func AuthCreate(c buffalo.Context) error {
 			// couldn't find an user with the supplied email address.
 			return bad()
 		}
-		return c.Error(http.StatusInternalServerError, errors.New(err))
+		return c.Error(http.StatusInternalServerError, err)
 	}
 
 	// confirm that the given password matches the hashed password from the db
