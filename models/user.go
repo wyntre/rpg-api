@@ -23,6 +23,7 @@ type User struct {
 	Password             	string 		 `json:"password" db:"-"`
 	PasswordConfirmation 	string		 `json:"password_confirmation" db:"-"`
 	Characters            Characters `json:"characters,omitempty" has_many:"characters" order_by:"created_at asc"`
+	Campaigns             Campaigns  `json:"campaigns,omitempty" has_many:"campaigns" order_by:"created_at asc"`
 }
 
 // Create wraps up the pattern of encrypting the password and

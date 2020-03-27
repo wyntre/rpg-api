@@ -1,0 +1,7 @@
+create_table("campaigns") {
+	t.Column("id", "uuid", {primary: true})
+	t.Column("name", "string", {})
+	t.Column("description", "string", {})
+	t.Column("user_id", "uuid", {})
+	t.Timestamps()
+}

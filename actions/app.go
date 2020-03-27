@@ -96,6 +96,14 @@ func App() *buffalo.App {
 		characters.GET("/{id}", CharactersShow)
 		characters.PUT("/{id}", CharactersUpdate)
 		characters.DELETE("/{id}", CharactersDestroy)
+
+		campaigns := v1.Group("/campaigns")
+		campaignsResource := CampaignsResource{}
+		campaigns.GET("/", campaignsResource.List)
+		campaigns.POST("/new", campaignsResource.Create)
+		campaigns.GET("/{id}", campaignsResource.Show)
+		campaigns.PUT("/{id}", campaignsResource.Update)
+		campaigns.DELETE("/{id}", campaignsResource.Destroy)
 	}
 
 	return app
