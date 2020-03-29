@@ -1,30 +1,42 @@
 package actions
 
-import "github.com/wyntre/rpg_api/models"
+import (
+	"net/http"
+
+	"github.com/wyntre/rpg_api/models"
+)
 
 func (as *ActionSuite) Test_HomeHandler() {
-	res := as.HTML("/").Get()
-	as.Equal(302, res.Code)
-	as.Equal(res.Location(), "/auth/new")
+	res := as.JSON("/").Get()
+	as.Equal(http.StatusUnauthorized, res.Code)
 }
 
-func (as *ActionSuite) Test_HomeHandler_LoggedIn() {
-	u := &models.User{
-		Email:                "mark@example.com",
-		Password:             "password",
-		PasswordConfirmation: "password",
+func (as *ActionSuite) Test_HomeHandler_Authorized() {
+	// create valid user
+	user := &models.User{
+		Email: 								"test@test.com",
+		Password: 						"test",
+		PasswordConfirmation: "test",
 	}
-	verrs, err := u.Create(as.DB)
+	verrs, err := user.Create(as.DB)
 	as.NoError(err)
 	as.False(verrs.HasAny())
-	as.Session.Set("current_user_id", u.ID)
 
-	res := as.HTML("/auth").Get()
-	as.Equal(200, res.Code)
-	as.Contains(res.Body.String(), "Sign Out")
+	// correct login
+	auth := &AuthRequest{
+		Email: "test@test.com",
+		Password: "test",
+	}
 
-	as.Session.Clear()
-	res = as.HTML("/auth").Get()
-	as.Equal(200, res.Code)
-	as.Contains(res.Body.String(), "Sign In")
+	res := as.JSON("/v1/auth").Post(auth)
+	as.Equal(http.StatusAccepted, res.Code)
+	atr := &AuthTokenResponse{}
+	res.Bind(atr)
+	as.NotNil(atr.Token)
+
+	// auth'd request
+	req := as.JSON("/")
+	req.Headers["Authorization"] = atr.Token
+	res = req.Get()
+	as.Equal(http.StatusOK, res.Code)
 }
