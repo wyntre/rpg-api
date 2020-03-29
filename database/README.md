@@ -11,7 +11,7 @@ Setting up a test database using docker-compose.
 
 * To bring the database up
 ```bash
-docker-compose up
+docker-compose up -d
 ```
 
 * To bring the database down
