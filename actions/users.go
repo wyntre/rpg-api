@@ -7,6 +7,7 @@ import (
 	"github.com/gobuffalo/pop"
 	"github.com/pkg/errors"
 	"github.com/wyntre/rpg_api/models"
+  "github.com/gobuffalo/envy"
 )
 
 // UsersCreate registers a new user with the application.
@@ -26,6 +27,12 @@ func UsersCreate(c buffalo.Context) error {
 	if err := c.Bind(u); err != nil {
 		return errors.WithStack(err)
 	}
+
+  c.Logger().Info(envy.Get("JWT_PUBLIC_KEY", ""))
+	c.Logger().Info(envy.Get("JWT_PRIVATE_KEY", ""))
+  data := *u
+  data.Password = "*"
+  c.Logger().Info(data)
 
 	tx := c.Value("tx").(*pop.Connection)
 	verrs, err := u.Create(tx)
