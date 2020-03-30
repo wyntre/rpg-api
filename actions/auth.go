@@ -83,12 +83,14 @@ func AuthCreate(c buffalo.Context) error {
 //  417 with verrs
 //  202
 func AuthDestroy(c buffalo.Context) error {
+	// get token and strip "Bearer " from string
 	token := &models.Revokedtoken{}
 	token.Token = strings.Split(
 		c.Request().Header.Get("Authorization"),
 		"Bearer ",
 	)[1]
 
+	// add revoked token to database
   tx := c.Value("tx").(*pop.Connection)
   verrs, err := token.Create(tx)
 	if err != nil {
@@ -96,7 +98,11 @@ func AuthDestroy(c buffalo.Context) error {
 	}
 
   if verrs.HasAny() {
-		return c.Error(http.StatusExpectationFailed, errors.New(verrs.Error()))
+		// return clean error message, remove extra data provided by validator
+		return c.Error(http.StatusExpectationFailed, errors.New(strings.Split(
+			verrs.Error(),
+			"%",
+		)[0]))
 	}
 
   return c.Render(http.StatusAccepted, r.JSON(map[string]string{
@@ -116,9 +122,15 @@ func AuthGenerateToken(u *models.User) (string, error) {
 		return "", errors.New("error parsing key")
 	}
 
+	expireTime := envy.Get("JWT_TOKEN_EXPIRATION", "2h")
+	expireToken, err := time.ParseDuration(expireTime)
+	if err != nil {
+		return "", errors.New("token expiration error")
+	}
+
 	token := jwt.NewWithClaims(jwt.SigningMethodRS256, jwt.MapClaims{
 		"id": u.ID,
-		"exp": time.Now().Add(time.Hour * 2).Unix(),
+		"exp": time.Now().Add(expireToken).Unix(),
 	})
 	signedToken, err := token.SignedString(parsedKey)
 	if err != nil {
