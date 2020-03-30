@@ -6,11 +6,13 @@ import (
 	"github.com/wyntre/rpg_api/models"
 )
 
+// test no token provided
 func (as *ActionSuite) Test_HomeHandler() {
 	res := as.JSON("/").Get()
 	as.Equal(http.StatusUnauthorized, res.Code)
 }
 
+// test valid auth token
 func (as *ActionSuite) Test_HomeHandler_Authorized() {
 	// create valid user
 	user := &models.User{
