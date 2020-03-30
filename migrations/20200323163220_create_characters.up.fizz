@@ -3,6 +3,8 @@ create_table("characters") {
 	t.Column("user_id", "uuid", {})
 	t.Column("name", "string", {})
 	t.Column("description", "text", {})
+	t.Column("campaign_id", "uuid")
 	t.ForeignKey("user_id", {"users": ["id"]}, {})
+	t.ForeignKey("campaign_id", {"campaigns": ["id"]}, {})
 	t.Timestamps()
 }

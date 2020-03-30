@@ -15,6 +15,8 @@ type Character struct {
 		User				*User     `json:"user,omitempty" belongs_to:"user"`
     Name 				string 		`json:"name" db:"name"`
     Description string 		`json:"description" db:"description"`
+		CampaignID  uuid.UUID `json:"-" db:"campaign_id"`
+		Campaign    *Campaign `json:"campaign,omitempty" belongs_to:"campaign"`
     CreatedAt 	time.Time `json:"created_at" db:"created_at"`
     UpdatedAt 	time.Time `json:"updated_at" db:"updated_at"`
 }
