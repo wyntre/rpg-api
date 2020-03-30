@@ -2,8 +2,6 @@ package actions
 
 import (
 	"net/http"
-
-	"github.com/wyntre/rpg_api/models"
 )
 
 // test no token provided
@@ -20,6 +18,6 @@ func (as *ActionSuite) Test_HomeHandler_Authorized() {
 	// auth'd request
 	req := as.JSON("/")
 	req.Headers["Authorization"] = token
-	res = req.Get()
+	res := req.Get()
 	as.Equal(http.StatusOK, res.Code)
 }
