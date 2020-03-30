@@ -44,7 +44,7 @@ func (as *ActionSuite) Test_Auth_Create_Fail() {
 	as.NoError(err)
 	as.False(verrs.HasAny())
 
-	// correct login
+	// incorrect password
 	auth := &AuthRequest{
 		Email: "test@test.com",
 		Password: "fake",
@@ -53,6 +53,18 @@ func (as *ActionSuite) Test_Auth_Create_Fail() {
 	res := as.JSON("/v1/auth").Post(auth)
 	as.Equal(http.StatusUnauthorized, res.Code)
 	er := &ErrorResponse{}
+	res.Bind(er)
+	as.NotNil(er.Error)
+	as.Equal("invalid email/password", er.Error)
+
+	// incorrect email
+	auth = &AuthRequest{
+		Email: "test@fake.com",
+		Password: "test",
+	}
+
+	res = as.JSON("/v1/auth").Post(auth)
+	as.Equal(http.StatusUnauthorized, res.Code)
 	res.Bind(er)
 	as.NotNil(er.Error)
 	as.Equal("invalid email/password", er.Error)
