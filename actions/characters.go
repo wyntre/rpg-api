@@ -125,6 +125,9 @@ func CharactersShow(c buffalo.Context) error {
   }
 
   character_id, err := uuid.FromString(c.Param("id"))
+  if err != nil {
+    return c.Error(http.StatusInternalServerError, errors.New("bad character id"))
+  }
 
   character := &models.Character{}
 
@@ -154,6 +157,9 @@ func CharactersUpdate(c buffalo.Context) error {
   }
 
   character_id, err := uuid.FromString(c.Param("id"))
+  if err != nil {
+    return c.Error(http.StatusInternalServerError, errors.New("bad character id"))
+  }
 
   character := &models.Character{}
 
