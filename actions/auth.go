@@ -98,7 +98,7 @@ func AuthDestroy(c buffalo.Context) error {
 
 	// add revoked token to database
   tx := c.Value("tx").(*pop.Connection)
-  verrs, err := token.ValidateCreate(tx)
+  verrs, err := tx.ValidateAndCreate(token)
 	if err != nil {
 		return c.Error(http.StatusInternalServerError, errors.New("could not invalidate token"))
 	}
