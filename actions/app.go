@@ -54,8 +54,12 @@ func App() *buffalo.App {
 		// Automatically redirect to SSL
 		app.Use(forceSSL())
 
+		if ENV == "test" {
+			envy.Set("JWT_PUBLIC_KEY", "test_keys/test_key_public.pem")
+			envy.Set("JWT_PRIVATE_KEY", "test_keys/test_key_private.pem")
+		}
+
 		// Setup JWT
-		envy.Set("JWT_PUBLIC_KEY", "keys/rsapub.pem")
 		TokenAuthentication := tokenauth.New(tokenauth.Options{
 			SignMethod: jwt.SigningMethodRS256,
 		})
