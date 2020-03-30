@@ -16,10 +16,6 @@ type Revokedtoken struct {
     UpdatedAt time.Time `json:"updated_at" db:"updated_at"`
 }
 
-func (t *Revokedtoken) Create(tx *pop.Connection) (*validate.Errors, error) {
-	return tx.ValidateAndCreate(t)
-}
-
 // String is not required by pop and may be deleted
 func (r Revokedtoken) String() string {
 	jr, _ := json.Marshal(r)
