@@ -37,11 +37,8 @@ func AuthCreate(c buffalo.Context) error {
 		return c.Error(http.StatusUnprocessableEntity, errors.New("incorrect auth fields"))
 	}
 
-	c.Logger().Info(envy.Get("JWT_PUBLIC_KEY", ""))
-	c.Logger().Info(envy.Get("JWT_PRIVATE_KEY", ""))
-	data := *u
-  data.Password = "*"
-  c.Logger().Info(data)
+	c.Logger().Debug(envy.Get("JWT_PUBLIC_KEY", ""))
+	c.Logger().Debug(envy.Get("JWT_PRIVATE_KEY", ""))
 
 	tx := c.Value("tx").(*pop.Connection)
 
