@@ -18,7 +18,7 @@ import (
 //    Description: string
 // Return:
 //    Success:  201, return Character JSON
-//    Error:    409, with errors
+//    Error:    409, 500, with errors
 func CharactersCreate(c buffalo.Context) error {
   // grab user id from claims
   claims := c.Value("claims").(jwt.MapClaims)
@@ -30,7 +30,7 @@ func CharactersCreate(c buffalo.Context) error {
   character := &models.Character{}
 
   if err := c.Bind(character); err != nil {
-		return c.Error(http.StatusInternalServerError, errors.New("incorrect character data"))
+		return c.Error(http.StatusInternalServerError, errors.New("bad character data"))
 	}
 
   character.UserID = user_id
@@ -38,6 +38,7 @@ func CharactersCreate(c buffalo.Context) error {
 	tx := c.Value("tx").(*pop.Connection)
 	verrs, err := tx.ValidateAndCreate(character)
 	if err != nil {
+    c.Logger().Debug(err)
 		return c.Error(http.StatusInternalServerError, errors.New("character not created"))
 	}
 

@@ -10,6 +10,12 @@ type CharactersListResponse struct {
   Characters models.Characters `json:characters`
 }
 
+type BadCharacter struct {
+  Name string `json:name`
+  Description string `json:description`
+  ExtraData string `json:extradata`
+}
+
 func (as *ActionSuite) Test_Characters_Create() {
   // create valid user
   token := as.CreateUser("test@test.com", "test")
@@ -46,6 +52,24 @@ func (as *ActionSuite) Test_Characters_Create_Fail() {
 	req.Headers["Authorization"] = token
 	res := req.Post(character)
 	as.Equal(http.StatusConflict, res.Code)
+}
+
+func (as *ActionSuite) Test_Characters_Create_Extra() {
+  // create valid user
+	token := as.CreateUser("test@test.com", "test")
+
+  // create invalid character data
+  character := &BadCharacter{
+    Name: "Test",
+    Description: "Test description",
+    ExtraData: "Extra Data",
+  }
+
+  // request character creation
+	req := as.JSON("/v1/characters/new")
+	req.Headers["Authorization"] = token
+	res := req.Post(character)
+	as.Equal(http.StatusCreated, res.Code)
 }
 
 func (as *ActionSuite) Test_Characters_Destroy() {
