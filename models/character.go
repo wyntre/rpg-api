@@ -7,18 +7,19 @@ import (
 	"github.com/gofrs/uuid"
 	"time"
 	"github.com/gobuffalo/validate/validators"
+	"github.com/gobuffalo/nulls"
 )
 // Character is used by pop to map your .model.Name.Proper.Pluralize.Underscore database table to your go code.
 type Character struct {
-    ID 					uuid.UUID `json:"id" db:"id"`
-		UserID			uuid.UUID `json:"-" db:"user_id"`
-		User				*User     `json:"user,omitempty" belongs_to:"user"`
-    Name 				string 		`json:"name" db:"name"`
-    Description string 		`json:"description" db:"description"`
-		CampaignID  uuid.UUID `json:"-" db:"campaign_id"`
-		Campaign    *Campaign `json:"campaign,omitempty" belongs_to:"campaign"`
-    CreatedAt 	time.Time `json:"created_at" db:"created_at"`
-    UpdatedAt 	time.Time `json:"updated_at" db:"updated_at"`
+    ID 					uuid.UUID  `json:"id" db:"id"`
+		UserID			uuid.UUID  `json:"-" db:"user_id"`
+		User				*User      `json:"user,omitempty" belongs_to:"user"`
+    Name 				string 		 `json:"name" db:"name"`
+    Description string 		 `json:"description" db:"description"`
+		CampaignID  nulls.UUID `json:"-" db:"campaign_id"`
+		Campaign    *Campaign  `json:"campaign,omitempty" belongs_to:"campaign"`
+    CreatedAt 	time.Time  `json:"created_at" db:"created_at"`
+    UpdatedAt 	time.Time  `json:"updated_at" db:"updated_at"`
 }
 
 // String is not required by pop and may be deleted

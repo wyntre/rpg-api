@@ -45,6 +45,7 @@ CREATE TABLE public.characters (
     user_id uuid NOT NULL,
     name character varying(255) NOT NULL,
     description text NOT NULL,
+    campaign_id uuid,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
@@ -129,6 +130,14 @@ ALTER TABLE ONLY public.users
 --
 
 CREATE UNIQUE INDEX schema_migration_version_idx ON public.schema_migration USING btree (version);
+
+
+--
+-- Name: characters characters_campaign_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: buffalo
+--
+
+ALTER TABLE ONLY public.characters
+    ADD CONSTRAINT characters_campaign_id_fkey FOREIGN KEY (campaign_id) REFERENCES public.campaigns(id);
 
 
 --
