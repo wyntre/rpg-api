@@ -130,9 +130,12 @@ func CharactersShow(c buffalo.Context) error {
     return c.Error(http.StatusInternalServerError, errors.New("bad character id"))
   }
 
-  character := &models.Character{}
+  tx, ok := c.Value("tx").(*pop.Connection)
+  if !ok {
+    return errors.New("no transaction found")
+  }
 
-  tx := c.Value("tx").(*pop.Connection)
+  character := &models.Character{}
   if err := tx.Where("user_id = ?", user_id).Find(character, character_id); err != nil {
     return c.Error(http.StatusNotFound, errors.New("character not found"))
   }
