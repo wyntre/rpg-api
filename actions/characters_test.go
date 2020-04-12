@@ -225,8 +225,6 @@ func (as *ActionSuite) Test_Characters_Show_Other_User() {
 	as.Equal(http.StatusNotFound, res.Code)
 }
 
-
-
 func (as *ActionSuite) Test_Characters_Update() {
   // create valid user
 	token := as.CreateUser("test@test.com", "test")
