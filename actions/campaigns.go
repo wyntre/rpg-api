@@ -1,7 +1,6 @@
 package actions
 
 import (
-  "fmt"
   "net/http"
   "github.com/gobuffalo/buffalo"
   "github.com/gobuffalo/pop"
@@ -42,7 +41,7 @@ func (v CampaignsResource) List(c buffalo.Context) error {
   // Get the DB connection from the context
   tx, ok := c.Value("tx").(*pop.Connection)
   if !ok {
-    return fmt.Errorf("no transaction found")
+    return errors.New("no transaction found")
   }
 
   // Retrieve all Campaigns from the DB
@@ -64,18 +63,23 @@ func (v CampaignsResource) Show(c buffalo.Context) error {
     return c.Error(http.StatusInternalServerError, errors.New("bad user id"))
   }
 
+  campaign_id, err := uuid.FromString(c.Param("id"))
+  if err != nil {
+    return c.Error(http.StatusInternalServerError, errors.New("bad campaign id"))
+  }
+
   // Get the DB connection from the context
   tx, ok := c.Value("tx").(*pop.Connection)
   if !ok {
-    return fmt.Errorf("no transaction found")
+    return errors.New("no transaction found")
   }
 
   // Allocate an empty Campaign
   campaign := &models.Campaign{}
 
   // To find the Campaign the parameter campaign_id is used.
-  if err := tx.Where("user_id = ?", user_id).Find(campaign, c.Param("campaign_id")); err != nil {
-    return c.Error(http.StatusNotFound, err)
+  if err := tx.Where("user_id = ?", user_id).Find(campaign, campaign_id); err != nil {
+    return c.Error(http.StatusNotFound, errors.New("campaign not found"))
   }
 
   return c.Render(200, r.JSON(campaign))
@@ -103,7 +107,7 @@ func (v CampaignsResource) Create(c buffalo.Context) error {
   // Get the DB connection from the context
   tx, ok := c.Value("tx").(*pop.Connection)
   if !ok {
-    return fmt.Errorf("no transaction found")
+    return errors.New("no transaction found")
   }
 
   // Validate the data from the html form
@@ -128,10 +132,15 @@ func (v CampaignsResource) Update(c buffalo.Context) error {
     return c.Error(http.StatusInternalServerError, errors.New("bad user id"))
   }
 
+  campaign_id, err := uuid.FromString(c.Param("id"))
+  if err != nil {
+    return c.Error(http.StatusInternalServerError, errors.New("bad campaign id"))
+  }
+
   // Get the DB connection from the context
   tx, ok := c.Value("tx").(*pop.Connection)
   if !ok {
-    return fmt.Errorf("no transaction found")
+    return errors.New("no transaction found")
   }
 
   // Allocate an empty Campaign
@@ -139,7 +148,7 @@ func (v CampaignsResource) Update(c buffalo.Context) error {
 
   campaign.UserID = user_id
 
-  if err := tx.Where("user_id = ?", user_id).Find(campaign, c.Param("campaign_id")); err != nil {
+  if err := tx.Where("user_id = ?", user_id).Find(campaign, campaign_id); err != nil {
     return c.Error(http.StatusNotFound, err)
   }
 
@@ -169,17 +178,22 @@ func (v CampaignsResource) Destroy(c buffalo.Context) error {
     return c.Error(http.StatusInternalServerError, errors.New("bad user id"))
   }
 
+  campaign_id, err := uuid.FromString(c.Param("id"))
+  if err != nil {
+    return c.Error(http.StatusInternalServerError, errors.New("bad campaign id"))
+  }
+
   // Get the DB connection from the context
   tx, ok := c.Value("tx").(*pop.Connection)
   if !ok {
-    return fmt.Errorf("no transaction found")
+    return errors.New("no transaction found")
   }
 
   // Allocate an empty Campaign
   campaign := &models.Campaign{}
 
   // To find the Campaign the parameter campaign_id is used.
-  if err := tx.Where("user_id = ?", user_id).Find(campaign, c.Param("campaign_id")); err != nil {
+  if err := tx.Where("user_id = ?", user_id).Find(campaign, campaign_id); err != nil {
     return c.Error(http.StatusNotFound, err)
   }
 
