@@ -45,3 +45,18 @@ func (as *ActionSuite) Test_Users_Create_Bad_Email() {
   as.Equal(http.StatusConflict, res.Code)
   as.Equal("Incorrect email format", e.Error)
 }
+
+func (as *ActionSuite) Test_Users_Create_Bad_Password() {
+  u := &CreateUserRequest{
+    Email: "test@test.com",
+    Password: "test",
+    PasswordConfirmation: "test2",
+  }
+
+  e := &CreateUserFailureResponse{}
+
+  res := as.JSON("/v1/users").Post(u)
+  res.Bind(e)
+  as.Equal(http.StatusConflict, res.Code)
+  as.Equal("Password does not match confirmation", e.Error)
+}
