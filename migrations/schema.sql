@@ -54,6 +54,24 @@ CREATE TABLE public.characters (
 ALTER TABLE public.characters OWNER TO buffalo;
 
 --
+-- Name: quests; Type: TABLE; Schema: public; Owner: buffalo
+--
+
+CREATE TABLE public.quests (
+    id uuid NOT NULL,
+    name character varying(255) NOT NULL,
+    description character varying(255) NOT NULL,
+    user_id uuid NOT NULL,
+    campaign_id uuid NOT NULL,
+    sort_order integer NOT NULL,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+ALTER TABLE public.quests OWNER TO buffalo;
+
+--
 -- Name: revokedtokens; Type: TABLE; Schema: public; Owner: buffalo
 --
 
@@ -110,6 +128,14 @@ ALTER TABLE ONLY public.characters
 
 
 --
+-- Name: quests quests_pkey; Type: CONSTRAINT; Schema: public; Owner: buffalo
+--
+
+ALTER TABLE ONLY public.quests
+    ADD CONSTRAINT quests_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: revokedtokens revokedtokens_pkey; Type: CONSTRAINT; Schema: public; Owner: buffalo
 --
 
@@ -133,6 +159,14 @@ CREATE UNIQUE INDEX schema_migration_version_idx ON public.schema_migration USIN
 
 
 --
+-- Name: campaigns campaigns_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: buffalo
+--
+
+ALTER TABLE ONLY public.campaigns
+    ADD CONSTRAINT campaigns_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id);
+
+
+--
 -- Name: characters characters_campaign_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: buffalo
 --
 
@@ -146,6 +180,22 @@ ALTER TABLE ONLY public.characters
 
 ALTER TABLE ONLY public.characters
     ADD CONSTRAINT characters_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id);
+
+
+--
+-- Name: quests quests_campaign_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: buffalo
+--
+
+ALTER TABLE ONLY public.quests
+    ADD CONSTRAINT quests_campaign_id_fkey FOREIGN KEY (campaign_id) REFERENCES public.campaigns(id);
+
+
+--
+-- Name: quests quests_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: buffalo
+--
+
+ALTER TABLE ONLY public.quests
+    ADD CONSTRAINT quests_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id);
 
 
 --

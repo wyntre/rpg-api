@@ -14,6 +14,25 @@ type CampaignsListResponse struct {
   Campaigns models.Campaigns `json:campaigns`
 }
 
+func (as *ActionSuite) CreateCampaign(name string, description string, token string) *models.Campaign {
+  // create campaign
+  campaignRequest := &CreateCampaignRequest{
+    Name:        name,
+    Description: description,
+  }
+
+  req := as.JSON("/v1/campaigns/new")
+  req.Headers["Authorization"] = token
+  res := req.Post(campaignRequest)
+  as.Equal(http.StatusCreated, res.Code)
+
+  campaign := &models.Campaign{}
+  res.Bind(campaign)
+  as.NotNil(campaign)
+
+  return campaign
+}
+
 func (as *ActionSuite) Test_Campaigns_Create() {
   token := as.CreateUser("test@test.com", "test")
 
@@ -73,7 +92,7 @@ func (as *ActionSuite) Test_Campaigns_Show() {
   res.Bind(campaign)
   as.NotNil(campaign)
 
-  req = as.JSON("/v1/campaigns/" + campaign.ID.String())
+  req = as.JSON("/v1/campaigns/show/" + campaign.ID.String())
   req.Headers["Authorization"] = token
   res = req.Get()
   as.Equal(http.StatusOK, res.Code)
@@ -87,7 +106,7 @@ func (as *ActionSuite) Test_Campaigns_Show() {
 func (as *ActionSuite) Test_Campaigns_Show_Fail() {
   token := as.CreateUser("test@test.com", "test")
 
-  req := as.JSON("/v1/campaigns/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa")
+  req := as.JSON("/v1/campaigns/show/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa")
   req.Headers["Authorization"] = token
   res := req.Get()
   as.Equal(http.StatusNotFound, res.Code)
@@ -113,7 +132,7 @@ func (as *ActionSuite) Test_Campaigns_Show_Other_User() {
   as.NotNil(campaign)
 
   // request campaign with token2
-  req = as.JSON("/v1/campaigns/" + campaign.ID.String())
+  req = as.JSON("/v1/campaigns/show/" + campaign.ID.String())
   req.Headers["Authorization"] = token2
   res = req.Get()
   as.Equal(http.StatusNotFound, res.Code)

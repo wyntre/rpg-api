@@ -8,51 +8,54 @@ import (
 	"time"
 	"github.com/gobuffalo/validate/validators"
 )
-// Campaign is used by pop to map your .model.Name.Proper.Pluralize.Underscore database table to your go code.
-type Campaign struct {
+// Quest is used by pop to map your .model.Name.Proper.Pluralize.Underscore database table to your go code.
+type Quest struct {
     ID 					uuid.UUID  `json:"id" db:"id"`
 		UserID 			uuid.UUID  `json:"-" db:"user_id"`
     Name 				string 		 `json:"name" db:"name"`
     Description string 		 `json:"description" db:"description"`
-		Characters  Characters `json:"characters,omitempty" has_many:"characters" order_by:"created_at asc"`
-		Quests			Quests		 `json:"quests,omitempty" has_many:"quests" order_by:"sort_order asc"`
+    CampaignID  uuid.UUID  `json:"campaign_id" db:"campaign_id"`
+    Campaign    *Campaign  `json:"campaign,omitempty" belongs_to:"campaign"`
     CreatedAt 	time.Time  `json:"created_at" db:"created_at"`
     UpdatedAt 	time.Time  `json:"updated_at" db:"updated_at"`
+    SortOrder   int        `json:"sort_order" db:"sort_order"`
 }
 
 // String is not required by pop and may be deleted
-func (c Campaign) String() string {
-	jc, _ := json.Marshal(c)
+func (q Quest) String() string {
+	jc, _ := json.Marshal(q)
 	return string(jc)
 }
 
-// Campaigns is not required by pop and may be deleted
-type Campaigns []Campaign
+// Quests is not required by pop and may be deleted
+type Quests []Quest
 
 // String is not required by pop and may be deleted
-func (c Campaigns) String() string {
-	jc, _ := json.Marshal(c)
+func (q Quests) String() string {
+	jc, _ := json.Marshal(q)
 	return string(jc)
 }
 
 // Validate gets run every time you call a "pop.Validate*" (pop.ValidateAndSave, pop.ValidateAndCreate, pop.ValidateAndUpdate) method.
 // This method is not required and may be deleted.
-func (c *Campaign) Validate(tx *pop.Connection) (*validate.Errors, error) {
+func (q *Quest) Validate(tx *pop.Connection) (*validate.Errors, error) {
 	return validate.Validate(
-		&validators.UUIDIsPresent{Field: c.UserID, Name: "UserID"},
-		&validators.StringIsPresent{Field: c.Name, Name: "Name"},
-		&validators.StringIsPresent{Field: c.Description, Name: "Description"},
+		&validators.UUIDIsPresent{Field: q.UserID, Name: "UserID"},
+		&validators.StringIsPresent{Field: q.Name, Name: "Name"},
+		&validators.StringIsPresent{Field: q.Description, Name: "Description"},
+    &validators.UUIDIsPresent{Field: q.CampaignID, Name: "CampaignID"},
+    &validators.IntIsPresent{Field: q.SortOrder, Name: "SortOrder"},
 	), nil
 }
 
 // ValidateCreate gets run every time you call "pop.ValidateAndCreate" method.
 // This method is not required and may be deleted.
-func (c *Campaign) ValidateCreate(tx *pop.Connection) (*validate.Errors, error) {
+func (q *Quest) ValidateCreate(tx *pop.Connection) (*validate.Errors, error) {
 	return validate.NewErrors(), nil
 }
 
 // ValidateUpdate gets run every time you call "pop.ValidateAndUpdate" method.
 // This method is not required and may be deleted.
-func (c *Campaign) ValidateUpdate(tx *pop.Connection) (*validate.Errors, error) {
+func (q *Quest) ValidateUpdate(tx *pop.Connection) (*validate.Errors, error) {
 	return validate.NewErrors(), nil
 }
