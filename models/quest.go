@@ -16,6 +16,7 @@ type Quest struct {
     Description string 		 `json:"description" db:"description"`
     CampaignID  uuid.UUID  `json:"campaign_id" db:"campaign_id"`
     Campaign    *Campaign  `json:"campaign,omitempty" belongs_to:"campaign"`
+		Maps				Maps			 `json:"maps,omitempty" has_many:"maps"`
     CreatedAt 	time.Time  `json:"created_at" db:"created_at"`
     UpdatedAt 	time.Time  `json:"updated_at" db:"updated_at"`
     SortOrder   int        `json:"sort_order" db:"sort_order"`
