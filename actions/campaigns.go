@@ -227,7 +227,7 @@ func (v CampaignsResource) Destroy(c buffalo.Context) error {
     }
   }
 
-  for i in range quests {
+  for i := range quests {
     maps := models.Maps{}
     if err := tx.Where("user_id = ?", user_id).Where("quest_id = ?", quests[i].ID).All(&maps); err != nil {
       if errors.Cause(err) != sql.ErrNoRows {
