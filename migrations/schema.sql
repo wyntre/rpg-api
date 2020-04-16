@@ -54,6 +54,24 @@ CREATE TABLE public.characters (
 ALTER TABLE public.characters OWNER TO buffalo;
 
 --
+-- Name: maps; Type: TABLE; Schema: public; Owner: buffalo
+--
+
+CREATE TABLE public.maps (
+    id uuid NOT NULL,
+    name character varying(255) NOT NULL,
+    description character varying(255) NOT NULL,
+    user_id uuid NOT NULL,
+    quest_id uuid NOT NULL,
+    sort_order integer NOT NULL,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+ALTER TABLE public.maps OWNER TO buffalo;
+
+--
 -- Name: quests; Type: TABLE; Schema: public; Owner: buffalo
 --
 
@@ -128,6 +146,14 @@ ALTER TABLE ONLY public.characters
 
 
 --
+-- Name: maps maps_pkey; Type: CONSTRAINT; Schema: public; Owner: buffalo
+--
+
+ALTER TABLE ONLY public.maps
+    ADD CONSTRAINT maps_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: quests quests_pkey; Type: CONSTRAINT; Schema: public; Owner: buffalo
 --
 
@@ -180,6 +206,22 @@ ALTER TABLE ONLY public.characters
 
 ALTER TABLE ONLY public.characters
     ADD CONSTRAINT characters_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id);
+
+
+--
+-- Name: maps maps_quest_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: buffalo
+--
+
+ALTER TABLE ONLY public.maps
+    ADD CONSTRAINT maps_quest_id_fkey FOREIGN KEY (quest_id) REFERENCES public.quests(id);
+
+
+--
+-- Name: maps maps_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: buffalo
+--
+
+ALTER TABLE ONLY public.maps
+    ADD CONSTRAINT maps_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id);
 
 
 --

@@ -116,6 +116,14 @@ func App() *buffalo.App {
 		quests.GET("/show/{id}", questsResource.Show)
 		quests.PUT("/{id}", questsResource.Update)
 		quests.DELETE("/{id}", questsResource.Destroy)
+
+		maps := v1.Group("/maps")
+		mapsResource := MapsResource{}
+		maps.GET("/{id}", mapsResource.List)
+		maps.POST("/new", mapsResource.Create)
+		maps.GET("/show/{id}", mapsResource.Show)
+		maps.PUT("/{id}", mapsResource.Update)
+		maps.DELETE("/{id}", mapsResource.Destroy)
 	}
 
 	return app

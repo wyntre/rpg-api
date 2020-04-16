@@ -190,6 +190,8 @@ func (v QuestsResource) Update(c buffalo.Context) error {
 
 // Destroy deletes a Quest from the DB. This function is mapped
 // to the path DELETE /quests/{quest_id}
+// This API should destroy all child elements (maps)
+// This API should accept the destroy command, any UI should implement a user check ("Are you sure?")
 func (v QuestsResource) Destroy(c buffalo.Context) error {
   claims := c.Value("claims").(jwt.MapClaims)
   user_id, err := uuid.FromString(claims["id"].(string))
@@ -213,11 +215,21 @@ func (v QuestsResource) Destroy(c buffalo.Context) error {
 
   // To find the Quest the parameter quest_id is used.
   if err := tx.Where("user_id = ?", user_id).Find(quest, quest_id); err != nil {
-    return c.Error(http.StatusNotFound, err)
+    return c.Error(http.StatusNotFound, errors.New("quest not found"))
+  }
+
+  maps := models.Maps{}
+  if err := tx.Where("user_id = ?", user_id).Where("quest_id = ?", quest.ID).All(&maps); err != nil {
+    if errors.Cause(err) != sql.ErrNoRows {
+      return c.Error(http.StatusInternalServerError, errors.New("cannot select maps"))
+    }
+  }
+  if err := tx.Destroy(maps); err != nil {
+    return c.Error(http.StatusInternalServerError, errors.New("could not destroy maps"))
   }
 
   if err := tx.Destroy(quest); err != nil {
-    return err
+    return c.Error(http.StatusInternalServerError, errors.New("could not destroy quest"))
   }
 
   return c.Render(http.StatusOK, r.JSON(quest))

@@ -2,6 +2,7 @@ package actions
 
 import (
   "net/http"
+  "database/sql"
   "github.com/gobuffalo/buffalo"
   "github.com/gobuffalo/pop"
   "github.com/wyntre/rpg_api/models"
@@ -173,7 +174,7 @@ func (v CampaignsResource) Update(c buffalo.Context) error {
 // Destroy deletes a Campaign from the DB. This function is mapped
 // to the path DELETE /campaigns/{campaign_id}
 // This API should zero out fields associated with the campaign (characters)
-// This API should destroy all child elements (quests)
+// This API should destroy all child elements (quests, maps)
 // This API should accept the destroy command, any UI should implement a user check ("Are you sure?")
 func (v CampaignsResource) Destroy(c buffalo.Context) error {
   claims := c.Value("claims").(jwt.MapClaims)
@@ -197,27 +198,57 @@ func (v CampaignsResource) Destroy(c buffalo.Context) error {
   campaign := &models.Campaign{}
 
   // To find the Campaign the parameter campaign_id is used.
-  if err := tx.Eager().Where("user_id = ?", user_id).Find(campaign, campaign_id); err != nil {
-    return c.Error(http.StatusNotFound, err)
+  if err := tx.Where("user_id = ?", user_id).Find(campaign, campaign_id); err != nil {
+    return c.Error(http.StatusNotFound, errors.New("campaign not found"))
   }
 
-  // zero out campaign ids in attached characters
-  for i := range campaign.Characters {
-      campaign.Characters[i].CampaignID = nulls.UUID{}
-      tx.ValidateAndUpdate(campaign.Characters[i])
-  }
-
-  // destroy children quests
-  for i := range campaign.Quests {
-    if err := tx.Destroy(campaign.Quests[i]); err != nil {
-      return err
+  characters := models.Characters{}
+  if err := tx.Where("campaign_id = ?", campaign.ID).All(&characters); err != nil {
+    if errors.Cause(err) != sql.ErrNoRows {
+      return c.Error(http.StatusInternalServerError, errors.New("cannot select characters"))
     }
+  }
+  // zero out campaign ids in attached characters
+  for i := range characters {
+      characters[i].CampaignID = nulls.UUID{}
+  }
+  verrs, err := tx.ValidateAndUpdate(characters)
+  if err != nil {
+    return c.Error(http.StatusInternalServerError, errors.New("could not update characters"))
+  }
+  if verrs.HasAny() {
+    return c.Error(http.StatusUnprocessableEntity, verrs)
+  }
+
+  quests := models.Quests{}
+  if err := tx.Where("user_id = ?", user_id).Where("campaign_id = ?", campaign.ID).All(&quests); err != nil {
+    if errors.Cause(err) != sql.ErrNoRows {
+      return c.Error(http.StatusInternalServerError, errors.New("cannot select quests"))
+    }
+  }
+
+  for i in range quests {
+    maps := models.Maps{}
+    if err := tx.Where("user_id = ?", user_id).Where("quest_id = ?", quests[i].ID).All(&maps); err != nil {
+      if errors.Cause(err) != sql.ErrNoRows {
+        return c.Error(http.StatusInternalServerError, errors.New("cannot select maps"))
+      }
+    }
+    if err := tx.Destroy(maps); err != nil {
+      return c.Error(http.StatusInternalServerError, errors.New("could not destroy maps"))
+    }
+  }
+
+  if err := tx.Destroy(quests); err != nil {
+    return c.Error(http.StatusInternalServerError, errors.New("could not destroy quests"))
   }
 
   // destroy campaign
   if err := tx.Destroy(campaign); err != nil {
-    return err
+    return c.Error(http.StatusInternalServerError, errors.New("could not destroy campaign"))
   }
 
-  return c.Render(http.StatusOK, r.JSON(campaign))
+  return c.Render(http.StatusOK, r.JSON(map[string]string{
+    "message": "campaign " + campaign.ID.String() + " deleted",
+    }))
 }

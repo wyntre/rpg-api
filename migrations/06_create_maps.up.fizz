@@ -1,0 +1,11 @@
+create_table("maps") {
+	t.Column("id", "uuid", {primary: true})
+	t.Column("name", "string", {})
+	t.Column("description", "string", {})
+	t.Column("user_id", "uuid", {})
+	t.Column("quest_id", "uuid", {})
+	t.Column("sort_order", "int", {})
+	t.ForeignKey("user_id", {"users": ["id"]}, {})
+	t.ForeignKey("quest_id", {"quests": ["id"]}, {})
+	t.Timestamps()
+}
