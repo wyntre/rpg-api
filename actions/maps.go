@@ -216,6 +216,16 @@ func (v MapsResource) Destroy(c buffalo.Context) error {
     return c.Error(http.StatusNotFound, err)
   }
 
+  levels := models.Levels{}
+  if err := tx.Where("user_id = ?", user_id).Where("map_id = ?", rpg_map.ID).All(&levels); err != nil {
+    if errors.Cause(err) != sql.ErrNoRows {
+      return c.Error(http.StatusInternalServerError, errors.New("cannot select levels"))
+    }
+  }
+  if err := tx.Destroy(levels); err != nil {
+    return c.Error(http.StatusInternalServerError, errors.New("could not destroy levels"))
+  }
+
   if err := tx.Destroy(rpg_map); err != nil {
     return err
   }

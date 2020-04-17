@@ -220,6 +220,7 @@ func (v CampaignsResource) Destroy(c buffalo.Context) error {
     return c.Error(http.StatusUnprocessableEntity, verrs)
   }
 
+  // start to destroy quests
   quests := models.Quests{}
   if err := tx.Where("user_id = ?", user_id).Where("campaign_id = ?", campaign.ID).All(&quests); err != nil {
     if errors.Cause(err) != sql.ErrNoRows {
@@ -228,20 +229,38 @@ func (v CampaignsResource) Destroy(c buffalo.Context) error {
   }
 
   for i := range quests {
+    // start to destroy maps
     maps := models.Maps{}
     if err := tx.Where("user_id = ?", user_id).Where("quest_id = ?", quests[i].ID).All(&maps); err != nil {
       if errors.Cause(err) != sql.ErrNoRows {
         return c.Error(http.StatusInternalServerError, errors.New("cannot select maps"))
       }
     }
+
+    for i := range maps {
+      // start to destroy levels
+      levels := models.Levels{}
+      if err := tx.Where("user_id = ?", user_id).Where("map_id = ?", maps[i].ID).All(&levels); err != nil {
+        if errors.Cause(err) != sql.ErrNoRows {
+          return c.Error(http.StatusInternalServerError, errors.New("cannot select levels"))
+        }
+      }
+      if err := tx.Destroy(levels); err != nil {
+        return c.Error(http.StatusInternalServerError, errors.New("could not destroy levels"))
+      }
+      // end to destroy levels
+    }
+
     if err := tx.Destroy(maps); err != nil {
       return c.Error(http.StatusInternalServerError, errors.New("could not destroy maps"))
     }
+    // end to destroy maps
   }
 
   if err := tx.Destroy(quests); err != nil {
     return c.Error(http.StatusInternalServerError, errors.New("could not destroy quests"))
   }
+  // end to destroy quests
 
   // destroy campaign
   if err := tx.Destroy(campaign); err != nil {

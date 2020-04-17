@@ -54,6 +54,24 @@ CREATE TABLE public.characters (
 ALTER TABLE public.characters OWNER TO buffalo;
 
 --
+-- Name: levels; Type: TABLE; Schema: public; Owner: buffalo
+--
+
+CREATE TABLE public.levels (
+    id uuid NOT NULL,
+    name character varying(255) NOT NULL,
+    description character varying(255) NOT NULL,
+    user_id uuid NOT NULL,
+    map_id uuid NOT NULL,
+    sort_order integer NOT NULL,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+ALTER TABLE public.levels OWNER TO buffalo;
+
+--
 -- Name: maps; Type: TABLE; Schema: public; Owner: buffalo
 --
 
@@ -146,6 +164,14 @@ ALTER TABLE ONLY public.characters
 
 
 --
+-- Name: levels levels_pkey; Type: CONSTRAINT; Schema: public; Owner: buffalo
+--
+
+ALTER TABLE ONLY public.levels
+    ADD CONSTRAINT levels_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: maps maps_pkey; Type: CONSTRAINT; Schema: public; Owner: buffalo
 --
 
@@ -206,6 +232,22 @@ ALTER TABLE ONLY public.characters
 
 ALTER TABLE ONLY public.characters
     ADD CONSTRAINT characters_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id);
+
+
+--
+-- Name: levels levels_map_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: buffalo
+--
+
+ALTER TABLE ONLY public.levels
+    ADD CONSTRAINT levels_map_id_fkey FOREIGN KEY (map_id) REFERENCES public.maps(id);
+
+
+--
+-- Name: levels levels_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: buffalo
+--
+
+ALTER TABLE ONLY public.levels
+    ADD CONSTRAINT levels_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id);
 
 
 --

@@ -218,16 +218,34 @@ func (v QuestsResource) Destroy(c buffalo.Context) error {
     return c.Error(http.StatusNotFound, errors.New("quest not found"))
   }
 
+  // start to destroy maps
   maps := models.Maps{}
   if err := tx.Where("user_id = ?", user_id).Where("quest_id = ?", quest.ID).All(&maps); err != nil {
     if errors.Cause(err) != sql.ErrNoRows {
       return c.Error(http.StatusInternalServerError, errors.New("cannot select maps"))
     }
   }
+
+  for i := range maps {
+    // start to destroy levels
+    levels := models.Levels{}
+    if err := tx.Where("user_id = ?", user_id).Where("map_id = ?", maps[i].ID).All(&levels); err != nil {
+      if errors.Cause(err) != sql.ErrNoRows {
+        return c.Error(http.StatusInternalServerError, errors.New("cannot select levels"))
+      }
+    }
+    if err := tx.Destroy(levels); err != nil {
+      return c.Error(http.StatusInternalServerError, errors.New("could not destroy levels"))
+    }
+    // end to destroy levels
+  }
+
   if err := tx.Destroy(maps); err != nil {
     return c.Error(http.StatusInternalServerError, errors.New("could not destroy maps"))
   }
+  // end to destroy maps
 
+  // destroy quest
   if err := tx.Destroy(quest); err != nil {
     return c.Error(http.StatusInternalServerError, errors.New("could not destroy quest"))
   }

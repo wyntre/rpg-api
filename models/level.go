@@ -8,55 +8,54 @@ import (
 	"time"
 	"github.com/gobuffalo/validate/validators"
 )
-// Map is used by pop to map your .model.Name.Proper.Pluralize.Underscore database table to your go code.
-type Map struct {
+// Level is used by pop to map your .model.Name.Proper.Pluralize.Underscore database table to your go code.
+type Level struct {
     ID 					uuid.UUID  `json:"id" db:"id"`
 		UserID 			uuid.UUID  `json:"-" db:"user_id"`
     Name 				string 		 `json:"name" db:"name"`
     Description string 		 `json:"description" db:"description"`
-    QuestID     uuid.UUID  `json:"quest_id" db:"quest_id"`
-    Quest       *Quest     `json:"quest,omitempty" belongs_to:"quest"`
-		Levels			Levels     `json:"levels,omitempty" has_many:"levels" order_by:"sort_order asc"`
+    MapID       uuid.UUID  `json:"map_id" db:"map_id"`
+    Map         *Map       `json:"map,omitempty" belongs_to:"map"`
     CreatedAt 	time.Time  `json:"created_at" db:"created_at"`
     UpdatedAt 	time.Time  `json:"updated_at" db:"updated_at"`
     SortOrder   int        `json:"sort_order" db:"sort_order"`
 }
 
 // String is not required by pop and may be deleted
-func (m Map) String() string {
-	jc, _ := json.Marshal(m)
+func (l Level) String() string {
+	jc, _ := json.Marshal(l)
 	return string(jc)
 }
 
-// Maps is not required by pop and may be deleted
-type Maps []Map
+// Levels is not required by pop and may be deleted
+type Levels []Level
 
 // String is not required by pop and may be deleted
-func (m Maps) String() string {
-	jc, _ := json.Marshal(m)
+func (l Levels) String() string {
+	jc, _ := json.Marshal(l)
 	return string(jc)
 }
 
 // Validate gets run every time you call a "pop.Validate*" (pop.ValidateAndSave, pop.ValidateAndCreate, pop.ValidateAndUpdate) method.
 // This method is not required and may be deleted.
-func (m *Map) Validate(tx *pop.Connection) (*validate.Errors, error) {
+func (l *Level) Validate(tx *pop.Connection) (*validate.Errors, error) {
 	return validate.Validate(
-		&validators.UUIDIsPresent{Field: m.UserID, Name: "UserID"},
-		&validators.StringIsPresent{Field: m.Name, Name: "Name"},
-		&validators.StringIsPresent{Field: m.Description, Name: "Description"},
-    &validators.UUIDIsPresent{Field: m.QuestID, Name: "QuestID"},
-    &validators.IntIsPresent{Field: m.SortOrder, Name: "SortOrder"},
+		&validators.UUIDIsPresent{Field: l.UserID, Name: "UserID"},
+		&validators.StringIsPresent{Field: l.Name, Name: "Name"},
+		&validators.StringIsPresent{Field: l.Description, Name: "Description"},
+    &validators.UUIDIsPresent{Field: l.MapID, Name: "MapID"},
+    &validators.IntIsPresent{Field: l.SortOrder, Name: "SortOrder"},
 	), nil
 }
 
 // ValidateCreate gets run every time you call "pop.ValidateAndCreate" method.
 // This method is not required and may be deleted.
-func (m *Map) ValidateCreate(tx *pop.Connection) (*validate.Errors, error) {
+func (l *Level) ValidateCreate(tx *pop.Connection) (*validate.Errors, error) {
 	return validate.NewErrors(), nil
 }
 
 // ValidateUpdate gets run every time you call "pop.ValidateAndUpdate" method.
 // This method is not required and may be deleted.
-func (m *Map) ValidateUpdate(tx *pop.Connection) (*validate.Errors, error) {
+func (l *Level) ValidateUpdate(tx *pop.Connection) (*validate.Errors, error) {
 	return validate.NewErrors(), nil
 }
