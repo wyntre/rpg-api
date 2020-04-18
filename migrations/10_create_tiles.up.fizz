@@ -1,0 +1,14 @@
+create_table("tiles") {
+	t.Column("id", "uuid", {primary: true})
+	t.Column("user_id", "uuid", {})
+  t.Column("x", "int", {})
+  t.Column("y", "int", {})
+  t.Column("level_id", "uuid", {})
+  t.Column("tile_type_id", "uuid", {})
+	t.ForeignKey("user_id", {"users": ["id"]}, {})
+  t.ForeignKey("level_id", {"levels": ["id"]}, {})
+  t.ForeignKey("tile_type_id", {"tile_types": ["id"]}, {})
+	t.Timestamps()
+}
+
+sql("ALTER TABLE tiles ADD CONSTRAINT unique_coords UNIQUE (x, y, level_id)")

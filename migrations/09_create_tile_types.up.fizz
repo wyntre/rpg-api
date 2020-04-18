@@ -1,0 +1,7 @@
+create_table("tile_types") {
+	t.Column("id", "uuid", {primary: true})
+	t.Column("name", "string", {})
+  t.Column("tile_category_id", "uuid", {})
+  t.ForeignKey("tile_category_id", {"tile_categories": ["id"]}, {})
+	t.Timestamps()
+}

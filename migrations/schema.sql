@@ -133,6 +133,53 @@ CREATE TABLE public.schema_migration (
 ALTER TABLE public.schema_migration OWNER TO buffalo;
 
 --
+-- Name: tile_categories; Type: TABLE; Schema: public; Owner: buffalo
+--
+
+CREATE TABLE public.tile_categories (
+    id uuid NOT NULL,
+    name character varying(255) NOT NULL,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+ALTER TABLE public.tile_categories OWNER TO buffalo;
+
+--
+-- Name: tile_types; Type: TABLE; Schema: public; Owner: buffalo
+--
+
+CREATE TABLE public.tile_types (
+    id uuid NOT NULL,
+    name character varying(255) NOT NULL,
+    tile_category_id uuid NOT NULL,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+ALTER TABLE public.tile_types OWNER TO buffalo;
+
+--
+-- Name: tiles; Type: TABLE; Schema: public; Owner: buffalo
+--
+
+CREATE TABLE public.tiles (
+    id uuid NOT NULL,
+    user_id uuid NOT NULL,
+    x integer NOT NULL,
+    y integer NOT NULL,
+    level_id uuid NOT NULL,
+    tile_type_id uuid NOT NULL,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+ALTER TABLE public.tiles OWNER TO buffalo;
+
+--
 -- Name: users; Type: TABLE; Schema: public; Owner: buffalo
 --
 
@@ -193,6 +240,38 @@ ALTER TABLE ONLY public.quests
 
 ALTER TABLE ONLY public.revokedtokens
     ADD CONSTRAINT revokedtokens_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: tile_categories tile_categories_pkey; Type: CONSTRAINT; Schema: public; Owner: buffalo
+--
+
+ALTER TABLE ONLY public.tile_categories
+    ADD CONSTRAINT tile_categories_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: tile_types tile_types_pkey; Type: CONSTRAINT; Schema: public; Owner: buffalo
+--
+
+ALTER TABLE ONLY public.tile_types
+    ADD CONSTRAINT tile_types_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: tiles tiles_pkey; Type: CONSTRAINT; Schema: public; Owner: buffalo
+--
+
+ALTER TABLE ONLY public.tiles
+    ADD CONSTRAINT tiles_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: tiles unique_coords; Type: CONSTRAINT; Schema: public; Owner: buffalo
+--
+
+ALTER TABLE ONLY public.tiles
+    ADD CONSTRAINT unique_coords UNIQUE (x, y, level_id);
 
 
 --
@@ -280,6 +359,38 @@ ALTER TABLE ONLY public.quests
 
 ALTER TABLE ONLY public.quests
     ADD CONSTRAINT quests_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id);
+
+
+--
+-- Name: tile_types tile_types_tile_category_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: buffalo
+--
+
+ALTER TABLE ONLY public.tile_types
+    ADD CONSTRAINT tile_types_tile_category_id_fkey FOREIGN KEY (tile_category_id) REFERENCES public.tile_categories(id);
+
+
+--
+-- Name: tiles tiles_level_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: buffalo
+--
+
+ALTER TABLE ONLY public.tiles
+    ADD CONSTRAINT tiles_level_id_fkey FOREIGN KEY (level_id) REFERENCES public.levels(id);
+
+
+--
+-- Name: tiles tiles_tile_type_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: buffalo
+--
+
+ALTER TABLE ONLY public.tiles
+    ADD CONSTRAINT tiles_tile_type_id_fkey FOREIGN KEY (tile_type_id) REFERENCES public.tile_types(id);
+
+
+--
+-- Name: tiles tiles_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: buffalo
+--
+
+ALTER TABLE ONLY public.tiles
+    ADD CONSTRAINT tiles_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id);
 
 
 --
