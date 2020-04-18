@@ -13,7 +13,7 @@ import (
 type Character struct {
     ID 					uuid.UUID  `json:"id" db:"id"`
 		UserID			uuid.UUID  `json:"-" db:"user_id"`
-		User				*User      `json:"user,omitempty" belongs_to:"user"`
+		User				*User      `json:"-" belongs_to:"user"`
     Name 				string 		 `json:"name" db:"name"`
     Description string 		 `json:"description" db:"description"`
 		CampaignID  nulls.UUID `json:"-" db:"campaign_id"`
