@@ -8,7 +8,6 @@ create_table("tiles") {
 	t.ForeignKey("user_id", {"users": ["id"]}, {})
   t.ForeignKey("level_id", {"levels": ["id"]}, {})
   t.ForeignKey("tile_type_id", {"tile_types": ["id"]}, {})
+	t.Index(["x", "y", "level_id"], {"unique": true})
 	t.Timestamps()
 }
-
-sql("ALTER TABLE tiles ADD CONSTRAINT unique_coords UNIQUE (x, y, level_id)")

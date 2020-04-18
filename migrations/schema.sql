@@ -267,14 +267,6 @@ ALTER TABLE ONLY public.tiles
 
 
 --
--- Name: tiles unique_coords; Type: CONSTRAINT; Schema: public; Owner: buffalo
---
-
-ALTER TABLE ONLY public.tiles
-    ADD CONSTRAINT unique_coords UNIQUE (x, y, level_id);
-
-
---
 -- Name: users users_pkey; Type: CONSTRAINT; Schema: public; Owner: buffalo
 --
 
@@ -287,6 +279,13 @@ ALTER TABLE ONLY public.users
 --
 
 CREATE UNIQUE INDEX schema_migration_version_idx ON public.schema_migration USING btree (version);
+
+
+--
+-- Name: tiles_x_y_level_id_idx; Type: INDEX; Schema: public; Owner: buffalo
+--
+
+CREATE UNIQUE INDEX tiles_x_y_level_id_idx ON public.tiles USING btree (x, y, level_id);
 
 
 --
