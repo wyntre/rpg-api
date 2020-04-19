@@ -2,24 +2,25 @@ package models
 
 import (
 	"encoding/json"
-	"github.com/gobuffalo/pop"
-	"github.com/gobuffalo/validate"
+	"github.com/gobuffalo/pop/v5"
+	"github.com/gobuffalo/validate/v3"
+	"github.com/gobuffalo/validate/v3/validators"
 	"github.com/gofrs/uuid"
 	"time"
-	"github.com/gobuffalo/validate/validators"
 )
+
 // Quest is used by pop to map your .model.Name.Proper.Pluralize.Underscore database table to your go code.
 type Quest struct {
-    ID 					uuid.UUID  `json:"id" db:"id"`
-		UserID 			uuid.UUID  `json:"-" db:"user_id"`
-    Name 				string 		 `json:"name" db:"name"`
-    Description string 		 `json:"description" db:"description"`
-    CampaignID  uuid.UUID  `json:"campaign_id" db:"campaign_id"`
-    Campaign    *Campaign  `json:"campaign,omitempty" belongs_to:"campaign"`
-		Maps				Maps			 `json:"maps,omitempty" has_many:"maps" order_by:"sort_order asc"`
-    CreatedAt 	time.Time  `json:"created_at" db:"created_at"`
-    UpdatedAt 	time.Time  `json:"updated_at" db:"updated_at"`
-    SortOrder   int        `json:"sort_order" db:"sort_order"`
+	ID          uuid.UUID `json:"id" db:"id"`
+	UserID      uuid.UUID `json:"-" db:"user_id"`
+	Name        string    `json:"name" db:"name"`
+	Description string    `json:"description" db:"description"`
+	CampaignID  uuid.UUID `json:"campaign_id" db:"campaign_id"`
+	Campaign    *Campaign `json:"campaign,omitempty" belongs_to:"campaign"`
+	Maps        Maps      `json:"maps,omitempty" has_many:"maps" order_by:"sort_order asc"`
+	CreatedAt   time.Time `json:"created_at" db:"created_at"`
+	UpdatedAt   time.Time `json:"updated_at" db:"updated_at"`
+	SortOrder   int       `json:"sort_order" db:"sort_order"`
 }
 
 // String is not required by pop and may be deleted
@@ -44,8 +45,8 @@ func (q *Quest) Validate(tx *pop.Connection) (*validate.Errors, error) {
 		&validators.UUIDIsPresent{Field: q.UserID, Name: "UserID"},
 		&validators.StringIsPresent{Field: q.Name, Name: "Name"},
 		&validators.StringIsPresent{Field: q.Description, Name: "Description"},
-    &validators.UUIDIsPresent{Field: q.CampaignID, Name: "CampaignID"},
-    &validators.IntIsPresent{Field: q.SortOrder, Name: "SortOrder"},
+		&validators.UUIDIsPresent{Field: q.CampaignID, Name: "CampaignID"},
+		&validators.IntIsPresent{Field: q.SortOrder, Name: "SortOrder"},
 	), nil
 }
 

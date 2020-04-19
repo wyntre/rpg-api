@@ -2,23 +2,24 @@ package models
 
 import (
 	"encoding/json"
-	"github.com/gobuffalo/pop"
-	"github.com/gobuffalo/validate"
+	"github.com/gobuffalo/pop/v5"
+	"github.com/gobuffalo/validate/v3"
+	"github.com/gobuffalo/validate/v3/validators"
 	"github.com/gofrs/uuid"
 	"time"
-	"github.com/gobuffalo/validate/validators"
 )
+
 // Level is used by pop to map your .model.Name.Proper.Pluralize.Underscore database table to your go code.
 type Level struct {
-    ID 					uuid.UUID  `json:"id" db:"id"`
-		UserID 			uuid.UUID  `json:"-" db:"user_id"`
-    Name 				string 		 `json:"name" db:"name"`
-    Description string 		 `json:"description" db:"description"`
-    MapID       uuid.UUID  `json:"map_id" db:"map_id"`
-    Map         *Map       `json:"map,omitempty" belongs_to:"map"`
-    CreatedAt 	time.Time  `json:"created_at" db:"created_at"`
-    UpdatedAt 	time.Time  `json:"updated_at" db:"updated_at"`
-    SortOrder   int        `json:"sort_order" db:"sort_order"`
+	ID          uuid.UUID `json:"id" db:"id"`
+	UserID      uuid.UUID `json:"-" db:"user_id"`
+	Name        string    `json:"name" db:"name"`
+	Description string    `json:"description" db:"description"`
+	MapID       uuid.UUID `json:"map_id" db:"map_id"`
+	Map         *Map      `json:"map,omitempty" belongs_to:"map"`
+	CreatedAt   time.Time `json:"created_at" db:"created_at"`
+	UpdatedAt   time.Time `json:"updated_at" db:"updated_at"`
+	SortOrder   int       `json:"sort_order" db:"sort_order"`
 }
 
 // String is not required by pop and may be deleted
@@ -43,8 +44,8 @@ func (l *Level) Validate(tx *pop.Connection) (*validate.Errors, error) {
 		&validators.UUIDIsPresent{Field: l.UserID, Name: "UserID"},
 		&validators.StringIsPresent{Field: l.Name, Name: "Name"},
 		&validators.StringIsPresent{Field: l.Description, Name: "Description"},
-    &validators.UUIDIsPresent{Field: l.MapID, Name: "MapID"},
-    &validators.IntIsPresent{Field: l.SortOrder, Name: "SortOrder"},
+		&validators.UUIDIsPresent{Field: l.MapID, Name: "MapID"},
+		&validators.IntIsPresent{Field: l.SortOrder, Name: "SortOrder"},
 	), nil
 }
 

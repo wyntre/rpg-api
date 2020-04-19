@@ -1,13 +1,13 @@
 package actions
 
 import (
-  "fmt"
-  "net/http"
+	"fmt"
 	"github.com/gobuffalo/buffalo"
-	"github.com/gobuffalo/pop"
+	"github.com/gobuffalo/envy"
+	"github.com/gobuffalo/pop/v5"
 	"github.com/pkg/errors"
 	"github.com/wyntre/rpg_api/models"
-  "github.com/gobuffalo/envy"
+	"net/http"
 )
 
 // UsersCreate registers a new user with the application.
@@ -28,7 +28,7 @@ func UsersCreate(c buffalo.Context) error {
 		return errors.WithStack(err)
 	}
 
-  c.Logger().Debug(envy.Get("JWT_PUBLIC_KEY", ""))
+	c.Logger().Debug(envy.Get("JWT_PUBLIC_KEY", ""))
 	c.Logger().Debug(envy.Get("JWT_PRIVATE_KEY", ""))
 
 	tx := c.Value("tx").(*pop.Connection)
@@ -38,16 +38,16 @@ func UsersCreate(c buffalo.Context) error {
 	}
 
 	if verrs.HasAny() {
-    c.Set("errors", verrs)
+		c.Set("errors", verrs)
 		return c.Error(http.StatusConflict, errors.New(verrs.Error()))
 	}
 
-  signedToken, err := AuthGenerateToken(u)
-  if err != nil {
-    return err
-  }
+	signedToken, err := AuthGenerateToken(u)
+	if err != nil {
+		return err
+	}
 
 	return c.Render(http.StatusCreated, r.JSON(map[string]string{
-    "token": fmt.Sprintf("Bearer %s", signedToken),
-    }))
+		"token": fmt.Sprintf("Bearer %s", signedToken),
+	}))
 }

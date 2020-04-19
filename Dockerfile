@@ -1,12 +1,12 @@
 # This is a multi-stage Dockerfile and requires >= Docker 17.05
 # https://docs.docker.com/engine/userguide/eng-image/multistage-build/
-FROM gobuffalo/buffalo:v0.15.5 as builder
+FROM gobuffalo/buffalo:v0.16.5 as builder
 
 RUN mkdir -p $GOPATH/src/github.com/wyntre
 WORKDIR $GOPATH/src/github.com/wyntre
 
 ADD . .
-ENV GO111MODULES=on
+ENV GO111MODULE=on
 RUN go get ./...
 RUN buffalo build --static -o /bin/app
 
@@ -25,6 +25,13 @@ COPY --from=builder /bin/app .
 ENV ADDR=0.0.0.0
 
 EXPOSE 3000
+
+RUN mkdir -p /keys
+ADD keys/rsapub.pem /keys
+ADD keys/rsakey.pem /keys
+
+ENV JWT_PUBLIC_KEY=/keys/rsapub.pem
+ENV JWT_PRIVATE_KEY=/keys/rsakey.pem
 
 # Uncomment to run the migrations before running the binary:
 # CMD /bin/app migrate; /bin/app
