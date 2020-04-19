@@ -4,8 +4,7 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/gobuffalo/packr/v2"
-	"github.com/gobuffalo/suite"
+	"github.com/gobuffalo/suite/v3"
 	"github.com/wyntre/rpg_api/models"
 )
 
@@ -14,7 +13,7 @@ type ActionSuite struct {
 }
 
 type AuthRequest struct {
-	Email string `json:email`
+	Email    string `json:email`
 	Password string `json:password`
 }
 
@@ -25,14 +24,11 @@ type AuthTokenResponse struct {
 type ErrorResponse struct {
 	Error string `json:error`
 	Trace string `json:trace`
-	Code 	string `json:code`
+	Code  string `json:code`
 }
 
 func Test_ActionSuite(t *testing.T) {
-	action, err := suite.NewActionWithFixtures(App(), packr.New("Test_ActionSuite", "../fixtures"))
-	if err != nil {
-		t.Fatal(err)
-	}
+	action := suite.NewAction(App())
 
 	as := &ActionSuite{
 		Action: action,
@@ -42,22 +38,22 @@ func Test_ActionSuite(t *testing.T) {
 
 func (as *ActionSuite) ObtainToken(email string, password string) string {
 	res := as.JSON("/v1/auth/").Post(&AuthRequest{
-      Email: email,
-      Password: password,
-   })
+		Email:    email,
+		Password: password,
+	})
 
- 	as.Equal(http.StatusAccepted, res.Code)
- 	atr := &AuthTokenResponse{}
- 	res.Bind(atr)
- 	as.NotNil(atr.Token)
+	as.Equal(http.StatusAccepted, res.Code)
+	atr := &AuthTokenResponse{}
+	res.Bind(atr)
+	as.NotNil(atr.Token)
 
 	return atr.Token
 }
 
 func (as *ActionSuite) CreateUser(email string, password string) string {
 	user := &models.User{
-		Email: 								email,
-		Password: 						password,
+		Email:                email,
+		Password:             password,
 		PasswordConfirmation: password,
 	}
 	verrs, err := user.Create(as.DB)

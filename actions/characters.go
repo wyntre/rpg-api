@@ -1,14 +1,14 @@
 package actions
 
 import (
-  "net/http"
+	"net/http"
 
+	"github.com/dgrijalva/jwt-go"
 	"github.com/gobuffalo/buffalo"
-	"github.com/gobuffalo/pop"
+	"github.com/gobuffalo/pop/v5"
+	"github.com/gofrs/uuid"
 	"github.com/pkg/errors"
 	"github.com/wyntre/rpg_api/models"
-  "github.com/dgrijalva/jwt-go"
-  "github.com/gofrs/uuid"
 )
 
 // URI: /v1/characters/new
@@ -20,68 +20,68 @@ import (
 //    Success:  201, return Character JSON
 //    Error:    409, 500, with errors
 func CharactersCreate(c buffalo.Context) error {
-  // grab user id from claims
-  claims := c.Value("claims").(jwt.MapClaims)
-  user_id, err := uuid.FromString(claims["id"].(string))
-  if err != nil {
-    return c.Error(http.StatusInternalServerError, errors.New("bad user id"))
-  }
+	// grab user id from claims
+	claims := c.Value("claims").(jwt.MapClaims)
+	user_id, err := uuid.FromString(claims["id"].(string))
+	if err != nil {
+		return c.Error(http.StatusInternalServerError, errors.New("bad user id"))
+	}
 
-  character := &models.Character{}
+	character := &models.Character{}
 
-  if err := c.Bind(character); err != nil {
+	if err := c.Bind(character); err != nil {
 		return c.Error(http.StatusInternalServerError, errors.New("bad character data"))
 	}
 
-  character.UserID = user_id
+	character.UserID = user_id
 
 	tx := c.Value("tx").(*pop.Connection)
 	verrs, err := tx.ValidateAndCreate(character)
 	if err != nil {
-    c.Logger().Debug(err)
+		c.Logger().Debug(err)
 		return c.Error(http.StatusInternalServerError, errors.New("character not created"))
 	}
 
 	if verrs.HasAny() {
-    c.Set("errors", verrs)
+		c.Set("errors", verrs)
 		return c.Error(http.StatusConflict, errors.New(verrs.Error()))
 	}
 
 	return c.Render(http.StatusCreated, r.JSON(
-    character,
-  ))
+		character,
+	))
 }
 
 func CharactersDestroy(c buffalo.Context) error {
-  // grab user id from claims
-  claims := c.Value("claims").(jwt.MapClaims)
-  user_id, err := uuid.FromString(claims["id"].(string))
-  if err != nil {
-    return c.Error(http.StatusInternalServerError, errors.New("bad user id"))
-  }
+	// grab user id from claims
+	claims := c.Value("claims").(jwt.MapClaims)
+	user_id, err := uuid.FromString(claims["id"].(string))
+	if err != nil {
+		return c.Error(http.StatusInternalServerError, errors.New("bad user id"))
+	}
 
-  // grab character id from url params
-  character_id, err := uuid.FromString(c.Param("id"))
-  if err != nil {
-    return c.Error(http.StatusInternalServerError, errors.New("bad character id"))
-  }
+	// grab character id from url params
+	character_id, err := uuid.FromString(c.Param("id"))
+	if err != nil {
+		return c.Error(http.StatusInternalServerError, errors.New("bad character id"))
+	}
 
-  // find character
-  character := &models.Character{}
-  tx := c.Value("tx").(*pop.Connection)
-  if err := tx.Where("user_id = ?", user_id).Find(character, character_id); err != nil {
-    return c.Error(http.StatusNotFound, errors.New("character not found"))
-  }
+	// find character
+	character := &models.Character{}
+	tx := c.Value("tx").(*pop.Connection)
+	if err := tx.Where("user_id = ?", user_id).Find(character, character_id); err != nil {
+		return c.Error(http.StatusNotFound, errors.New("character not found"))
+	}
 
-  // delete character
-  if err := tx.Destroy(character); err != nil {
-    return c.Error(http.StatusInternalServerError, errors.New("character not deleted"))
-  }
+	// delete character
+	if err := tx.Destroy(character); err != nil {
+		return c.Error(http.StatusInternalServerError, errors.New("character not deleted"))
+	}
 
-  // return response
-  return c.Render(http.StatusOK, r.JSON(map[string]string{
-    "message": "character deleted",
-    }))
+	// return response
+	return c.Render(http.StatusOK, r.JSON(map[string]string{
+		"message": "character deleted",
+	}))
 }
 
 // URI: /v1/characters/
@@ -92,22 +92,22 @@ func CharactersDestroy(c buffalo.Context) error {
 //    Success:  200, return List: Character JSON
 //    Error:    409, with errors
 func CharactersList(c buffalo.Context) error {
-  claims := c.Value("claims").(jwt.MapClaims)
-  user_id, err := uuid.FromString(claims["id"].(string))
-  if err != nil {
-    return c.Error(http.StatusInternalServerError, errors.New("bad user id"))
-  }
+	claims := c.Value("claims").(jwt.MapClaims)
+	user_id, err := uuid.FromString(claims["id"].(string))
+	if err != nil {
+		return c.Error(http.StatusInternalServerError, errors.New("bad user id"))
+	}
 
-  user := &models.User{}
+	user := &models.User{}
 
-  tx := c.Value("tx").(*pop.Connection)
-  if err := tx.Eager("Characters").Find(user, user_id); err != nil {
-    return c.Error(http.StatusNotFound, errors.New("characters not found"))
-  }
+	tx := c.Value("tx").(*pop.Connection)
+	if err := tx.Eager("Characters").Find(user, user_id); err != nil {
+		return c.Error(http.StatusNotFound, errors.New("characters not found"))
+	}
 
-  return c.Render(http.StatusOK, r.JSON(map[string]models.Characters{
-    "characters": user.Characters,
-    }))
+	return c.Render(http.StatusOK, r.JSON(map[string]models.Characters{
+		"characters": user.Characters,
+	}))
 }
 
 // URI: /v1/characters/:id
@@ -118,31 +118,31 @@ func CharactersList(c buffalo.Context) error {
 //    Success:  200, return Character JSON
 //    Error:    409, with errors
 func CharactersShow(c buffalo.Context) error {
-  // grab user id from claims
-  claims := c.Value("claims").(jwt.MapClaims)
-  user_id, err := uuid.FromString(claims["id"].(string))
-  if err != nil {
-    return c.Error(http.StatusInternalServerError, errors.New("bad user id"))
-  }
+	// grab user id from claims
+	claims := c.Value("claims").(jwt.MapClaims)
+	user_id, err := uuid.FromString(claims["id"].(string))
+	if err != nil {
+		return c.Error(http.StatusInternalServerError, errors.New("bad user id"))
+	}
 
-  character_id, err := uuid.FromString(c.Param("id"))
-  if err != nil {
-    return c.Error(http.StatusInternalServerError, errors.New("bad character id"))
-  }
+	character_id, err := uuid.FromString(c.Param("id"))
+	if err != nil {
+		return c.Error(http.StatusInternalServerError, errors.New("bad character id"))
+	}
 
-  tx, ok := c.Value("tx").(*pop.Connection)
-  if !ok {
-    return errors.New("no transaction found")
-  }
+	tx, ok := c.Value("tx").(*pop.Connection)
+	if !ok {
+		return errors.New("no transaction found")
+	}
 
-  character := &models.Character{}
-  if err := tx.Where("user_id = ?", user_id).Find(character, character_id); err != nil {
-    return c.Error(http.StatusNotFound, errors.New("character not found"))
-  }
+	character := &models.Character{}
+	if err := tx.Where("user_id = ?", user_id).Find(character, character_id); err != nil {
+		return c.Error(http.StatusNotFound, errors.New("character not found"))
+	}
 
-  return c.Render(http.StatusOK, r.JSON(
-    character,
-  ))
+	return c.Render(http.StatusOK, r.JSON(
+		character,
+	))
 }
 
 // URI: /v1/characters/:id
@@ -154,30 +154,30 @@ func CharactersShow(c buffalo.Context) error {
 //    Success:  200, return Character JSON
 //    Error:    409, with errors
 func CharactersUpdate(c buffalo.Context) error {
-  claims := c.Value("claims").(jwt.MapClaims)
-  user_id, err := uuid.FromString(claims["id"].(string))
-  if err != nil {
-    return c.Error(http.StatusInternalServerError, errors.New("bad user id"))
-  }
+	claims := c.Value("claims").(jwt.MapClaims)
+	user_id, err := uuid.FromString(claims["id"].(string))
+	if err != nil {
+		return c.Error(http.StatusInternalServerError, errors.New("bad user id"))
+	}
 
-  character_id, err := uuid.FromString(c.Param("id"))
-  if err != nil {
-    return c.Error(http.StatusInternalServerError, errors.New("bad character id"))
-  }
+	character_id, err := uuid.FromString(c.Param("id"))
+	if err != nil {
+		return c.Error(http.StatusInternalServerError, errors.New("bad character id"))
+	}
 
-  character := &models.Character{}
+	character := &models.Character{}
 
-  // ensure there is a character for the user
-  tx := c.Value("tx").(*pop.Connection)
-  if err := tx.Where("user_id = ?", user_id).Find(character, character_id); err != nil {
-    return c.Error(http.StatusNotFound, errors.New("character not found"))
-  }
+	// ensure there is a character for the user
+	tx := c.Value("tx").(*pop.Connection)
+	if err := tx.Where("user_id = ?", user_id).Find(character, character_id); err != nil {
+		return c.Error(http.StatusNotFound, errors.New("character not found"))
+	}
 
-  if err := c.Bind(character); err != nil {
+	if err := c.Bind(character); err != nil {
 		return c.Error(http.StatusInternalServerError, errors.New("incorrect character data"))
 	}
 
-  character.UserID = user_id
+	character.UserID = user_id
 
 	verrs, err := tx.ValidateAndUpdate(character)
 	if err != nil {
@@ -185,11 +185,11 @@ func CharactersUpdate(c buffalo.Context) error {
 	}
 
 	if verrs.HasAny() {
-    c.Set("errors", verrs)
+		c.Set("errors", verrs)
 		return c.Error(http.StatusConflict, errors.New(verrs.Error()))
 	}
 
 	return c.Render(http.StatusOK, r.JSON(
-    character,
-  ))
+		character,
+	))
 }

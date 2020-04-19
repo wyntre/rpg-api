@@ -3,16 +3,16 @@ package actions
 import (
 	"net/http"
 
-	"github.com/wyntre/rpg_api/models"
 	"github.com/gobuffalo/envy"
+	"github.com/wyntre/rpg_api/models"
 )
 
 // test valid auth token generated
 func (as *ActionSuite) Test_Auth_Create() {
 	// create valid user
 	user := &models.User{
-		Email: 								"test@test.com",
-		Password: 						"test",
+		Email:                "test@test.com",
+		Password:             "test",
 		PasswordConfirmation: "test",
 	}
 	verrs, err := user.Create(as.DB)
@@ -21,7 +21,7 @@ func (as *ActionSuite) Test_Auth_Create() {
 
 	// correct login
 	auth := &AuthRequest{
-		Email: "test@test.com",
+		Email:    "test@test.com",
 		Password: "test",
 	}
 
@@ -36,8 +36,8 @@ func (as *ActionSuite) Test_Auth_Create() {
 func (as *ActionSuite) Test_Auth_Create_Fail() {
 	// create valid user
 	user := &models.User{
-		Email: 								"test@test.com",
-		Password: 						"test",
+		Email:                "test@test.com",
+		Password:             "test",
 		PasswordConfirmation: "test",
 	}
 	verrs, err := user.Create(as.DB)
@@ -46,7 +46,7 @@ func (as *ActionSuite) Test_Auth_Create_Fail() {
 
 	// incorrect password
 	auth := &AuthRequest{
-		Email: "test@test.com",
+		Email:    "test@test.com",
 		Password: "fake",
 	}
 
@@ -59,7 +59,7 @@ func (as *ActionSuite) Test_Auth_Create_Fail() {
 
 	// incorrect email
 	auth = &AuthRequest{
-		Email: "test@fake.com",
+		Email:    "test@fake.com",
 		Password: "test",
 	}
 

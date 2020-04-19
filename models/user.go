@@ -5,9 +5,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/gobuffalo/pop"
-	"github.com/gobuffalo/validate"
-	"github.com/gobuffalo/validate/validators"
+	"github.com/gobuffalo/pop/v5"
+	"github.com/gobuffalo/validate/v3"
+	"github.com/gobuffalo/validate/v3/validators"
 	"github.com/gofrs/uuid"
 	"github.com/pkg/errors"
 	"golang.org/x/crypto/bcrypt"
@@ -15,15 +15,15 @@ import (
 
 //User is a generated model from buffalo-auth, it serves as the base for username/password authentication.
 type User struct {
-	ID           					uuid.UUID  `json:"id" db:"id"`
-	CreatedAt    					time.Time  `json:"created_at" db:"created_at"`
-	UpdatedAt    					time.Time  `json:"updated_at" db:"updated_at"`
-	Email        					string     `json:"email" db:"email"`
-	PasswordHash 					string     `json:"-" db:"password_hash"`
-	Password             	string 		 `json:"password" db:"-"`
-	PasswordConfirmation 	string		 `json:"password_confirmation" db:"-"`
-	Characters            Characters `json:"characters,omitempty" has_many:"characters" order_by:"created_at asc"`
-	Campaigns             Campaigns  `json:"campaigns,omitempty" has_many:"campaigns" order_by:"created_at asc"`
+	ID                   uuid.UUID  `json:"id" db:"id"`
+	CreatedAt            time.Time  `json:"created_at" db:"created_at"`
+	UpdatedAt            time.Time  `json:"updated_at" db:"updated_at"`
+	Email                string     `json:"email" db:"email"`
+	PasswordHash         string     `json:"-" db:"password_hash"`
+	Password             string     `json:"password" db:"-"`
+	PasswordConfirmation string     `json:"password_confirmation" db:"-"`
+	Characters           Characters `json:"characters,omitempty" has_many:"characters" order_by:"created_at asc"`
+	Campaigns            Campaigns  `json:"campaigns,omitempty" has_many:"campaigns" order_by:"created_at asc"`
 }
 
 // Create wraps up the pattern of encrypting the password and
@@ -59,7 +59,7 @@ func (u *User) Validate(tx *pop.Connection) (*validate.Errors, error) {
 	var err error
 	return validate.Validate(
 		&validators.StringIsPresent{Field: u.Email, Name: "Email"},
-    &validators.EmailIsPresent{Field: u.Email, Name: "Email", Message: "Incorrect email format"},
+		&validators.EmailIsPresent{Field: u.Email, Name: "Email", Message: "Incorrect email format"},
 		&validators.StringIsPresent{Field: u.PasswordHash, Name: "PasswordHash"},
 		// check to see if the email address is already taken:
 		&validators.FuncValidator{

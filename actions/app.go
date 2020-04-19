@@ -2,18 +2,18 @@ package actions
 
 import (
 	"github.com/gobuffalo/buffalo"
+	"github.com/gobuffalo/buffalo-pop/v2/pop/popmw"
 	"github.com/gobuffalo/envy"
 	forcessl "github.com/gobuffalo/mw-forcessl"
 	paramlogger "github.com/gobuffalo/mw-paramlogger"
 	"github.com/unrolled/secure"
 
-	"github.com/gobuffalo/buffalo-pop/pop/popmw"
+	"github.com/dgrijalva/jwt-go"
 	contenttype "github.com/gobuffalo/mw-contenttype"
+	"github.com/gobuffalo/mw-tokenauth"
 	"github.com/gobuffalo/x/sessions"
 	"github.com/rs/cors"
 	"github.com/wyntre/rpg_api/models"
-	"github.com/gobuffalo/mw-tokenauth"
-	"github.com/dgrijalva/jwt-go"
 )
 
 // ENV is used to help switch settings based on where the
@@ -78,10 +78,10 @@ func App() *buffalo.App {
 
 		app.GET("/", HomeHandler)
 
-    //define API version
-    v1 := app.Group("/v1")
+		//define API version
+		v1 := app.Group("/v1")
 
-    //Routes for Auth
+		//Routes for Auth
 		auth := v1.Group("/auth")
 		auth.POST("/", AuthCreate)
 		auth.DELETE("/", AuthDestroy)

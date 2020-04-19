@@ -1,21 +1,21 @@
 package actions
 
 import (
-	"fmt"
 	"database/sql"
+	"fmt"
+	"io/ioutil"
 	"net/http"
 	"strings"
 	"time"
-	"io/ioutil"
 
+	"github.com/dgrijalva/jwt-go"
 	"github.com/gobuffalo/buffalo"
-	"github.com/gobuffalo/pop"
-	"github.com/gobuffalo/validate"
+	"github.com/gobuffalo/envy"
+	"github.com/gobuffalo/pop/v5"
+	"github.com/gobuffalo/validate/v3"
 	"github.com/pkg/errors"
 	"github.com/wyntre/rpg_api/models"
 	"golang.org/x/crypto/bcrypt"
-	"github.com/dgrijalva/jwt-go"
-	"github.com/gobuffalo/envy"
 )
 
 // AuthCreate attempts to log the user in with an existing account.
@@ -73,8 +73,8 @@ func AuthCreate(c buffalo.Context) error {
 	}
 
 	return c.Render(http.StatusAccepted, r.JSON(map[string]string{
-    "token": fmt.Sprintf("Bearer %s", signedToken),
-    }))
+		"token": fmt.Sprintf("Bearer %s", signedToken),
+	}))
 }
 
 // AuthDestroy clears the session and logs a user out
@@ -94,13 +94,13 @@ func AuthDestroy(c buffalo.Context) error {
 	)[1]
 
 	// add revoked token to database
-  tx := c.Value("tx").(*pop.Connection)
-  verrs, err := tx.ValidateAndCreate(token)
+	tx := c.Value("tx").(*pop.Connection)
+	verrs, err := tx.ValidateAndCreate(token)
 	if err != nil {
 		return c.Error(http.StatusInternalServerError, errors.New("could not invalidate token"))
 	}
 
-  if verrs.HasAny() {
+	if verrs.HasAny() {
 		// return clean error message, remove extra data provided by validator
 		return c.Error(http.StatusExpectationFailed, errors.New(strings.Split(
 			verrs.Error(),
@@ -108,9 +108,9 @@ func AuthDestroy(c buffalo.Context) error {
 		)[0]))
 	}
 
-  return c.Render(http.StatusAccepted, r.JSON(map[string]string{
-    "message": "token invalidated",
-    }))
+	return c.Render(http.StatusAccepted, r.JSON(map[string]string{
+		"message": "token invalidated",
+	}))
 }
 
 func AuthGenerateToken(u *models.User) (string, error) {
@@ -132,7 +132,7 @@ func AuthGenerateToken(u *models.User) (string, error) {
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodRS256, jwt.MapClaims{
-		"id": u.ID,
+		"id":  u.ID,
 		"exp": time.Now().Add(expireToken).Unix(),
 	})
 	signedToken, err := token.SignedString(parsedKey)
