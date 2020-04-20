@@ -26,9 +26,11 @@ ENV ADDR=0.0.0.0
 
 EXPOSE 3000
 
+RUN apk add openssl
 RUN mkdir -p /keys
-ADD keys/rsapub.pem /keys
-ADD keys/rsakey.pem /keys
+ADD keys/gen_keys.sh /keys
+WORKDIR /keys
+RUN /keys/gen_keys.sh
 
 ENV JWT_PUBLIC_KEY=/keys/rsapub.pem
 ENV JWT_PRIVATE_KEY=/keys/rsakey.pem
