@@ -34,5 +34,5 @@ RUN /keys/gen_keys.sh
 WORKDIR /
 
 # Uncomment to run the migrations before running the binary:
-CMD /bin/app migrate; /bin/app
+CMD /bin/app
 # CMD exec /bin/app
