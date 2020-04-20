@@ -1,0 +1,20 @@
+version: '3.3'
+
+services:
+  api:
+    image: wyntre/rpg_api:dev
+    restart: always
+    environment:
+      JWT_PUBLIC_KEY: /keys/rsapub.pem
+      JWT_PRIVATE_KEY: /keys/rsakey.pem
+    ports:
+      - 3000:3000
+  db:
+    image: postgres:alpine
+    restart: always
+    environment:
+      POSTGRES_USER: buffalo
+      POSTGRES_PASSWORD: buffalo
+      POSTGRES_DB: rpg_api_development
+    ports:
+      - 5432:5432
