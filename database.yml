@@ -1,0 +1,9 @@
+---
+development:
+  url: {{envOr "DEVEL_DATABASE_URL" "postgres://buffalo:buffalo@db:5432/rpg_api_development?sslmode=disable"}}
+
+test:
+  url: {{envOr "TEST_DATABASE_URL" "postgres://buffalo:buffalo@127.0.0.1:5432/rpg_api_test?sslmode=disable"}}
+
+production:
+  url: {{envOr "DATABASE_URL" "postgres://buffalo:buffalo@127.0.0.1:5432/rpg_api_production?sslmode=disable"}}

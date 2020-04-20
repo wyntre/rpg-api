@@ -31,9 +31,7 @@ RUN mkdir -p /keys
 ADD keys/gen_keys.sh /keys
 WORKDIR /keys
 RUN /keys/gen_keys.sh
-
-ENV JWT_PUBLIC_KEY=/keys/rsapub.pem
-ENV JWT_PRIVATE_KEY=/keys/rsakey.pem
+WORKDIR /
 
 # Uncomment to run the migrations before running the binary:
 CMD /bin/app migrate; /bin/app

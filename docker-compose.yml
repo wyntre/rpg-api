@@ -2,13 +2,15 @@ version: '3.3'
 
 services:
   api:
-    image: wyntre/rpg_api:dev
+    image: mdpegman/rpg_api:dev
     restart: always
     environment:
       JWT_PUBLIC_KEY: /keys/rsapub.pem
       JWT_PRIVATE_KEY: /keys/rsakey.pem
     ports:
       - 3000:3000
+    depends_on:
+      - db
   db:
     image: postgres:alpine
     restart: always

@@ -26,5 +26,3 @@ generated/
 .vendor/
 
 keys/*.pem
-database.yml
-database/dbdata/
