@@ -3,7 +3,7 @@ package actions
 import (
   "net/http"
   "github.com/gobuffalo/buffalo"
-  "github.com/gobuffalo/pop"
+  "github.com/gobuffalo/pop/v5"
   "github.com/wyntre/rpg_api/models"
   "github.com/gofrs/uuid"
   "github.com/pkg/errors"
@@ -42,7 +42,11 @@ func (v TileCategoriesResource) List(c buffalo.Context) error {
     return c.Error(http.StatusNotFound, errors.New("tile categories not found"))
   }
 
-  return c.Render(http.StatusOK, r.JSON(tile_categories))
+  c.Logger().Debug(tile_categories)
+
+  return c.Render(http.StatusOK, r.JSON(map[string]models.TileCategories{
+    "tile_categories": *tile_categories,
+    }))
 }
 
 // Show gets the data for one TileCategory. This function is tile_categoryped to
@@ -114,6 +118,11 @@ func (v TileCategoriesResource) Update(c buffalo.Context) error {
   }
 
   tile_category := &models.TileCategory{}
+
+  if err := tx.Find(tile_category, tile_category_id); err != nil {
+		return c.Error(http.StatusNotFound, err)
+	}
+
   // Bind TileCategory to the html form elements
   if err := c.Bind(tile_category); err != nil {
     return err

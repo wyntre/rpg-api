@@ -10,7 +10,7 @@ type CreateTileCategoryRequest struct {
 }
 
 type TileCategoriesListResponse struct {
-	TileCategories models.TileCategories `json:tile_categories`
+	TileCategories models.TileCategories `json:"tile_categories"`
 }
 
 func (as *ActionSuite) CreateTileCategory(name string, token string) *models.TileCategory {
@@ -140,9 +140,8 @@ func (as *ActionSuite) Test_TileCategories_List() {
   as.CreateTileCategory("Test TileCategory", token)
   as.CreateTileCategory("Test TileCategory2", token)
 
-
 	clr := &TileCategoriesListResponse{}
-	req := as.JSON("/v1/tile_categories/")
+	req := as.JSON("/v1/tile_categories")
 	req.Headers["Authorization"] = token
 	res := req.Get()
 	res.Bind(clr)

@@ -134,7 +134,7 @@ func App() *buffalo.App {
 		levels.DELETE("/{id}", levelsResource.Destroy)
 
 		tile_categories := v1.Group("/tile_categories")
-		tile_categoriesResource := LevelsResource{}
+		tile_categoriesResource := TileCategoriesResource{}
 		tile_categories.GET("/", tile_categoriesResource.List)
 		tile_categories.POST("/new", tile_categoriesResource.Create)
 		tile_categories.GET("/show/{id}", tile_categoriesResource.Show)
