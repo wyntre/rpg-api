@@ -2,41 +2,44 @@
 
 Thank you for choosing Buffalo for your web development needs.
 
-## Database Setup
+## Environment Variables
 
-It looks like you chose to set up your application using a database! Fantastic!
-
-The first thing you need to do is open up the "database.yml" file and edit it to use the correct usernames, passwords, hosts, etc... that are appropriate for your environment.
-
-You will also need to make sure that **you** start/install the database of your choice. Buffalo **won't** install and start it for you.
-
-### Create Your Databases
-
-Ok, so you've edited the "database.yml" file and started your database, now Buffalo can create the databases in that file for you:
-
-	$ buffalo pop create -a
+* `JWT_PUBLIC_KEY` is used for the json web token received to authenticate to the API.  It is a file location of an OpenSSL public signing key.
+* `JWT_PRIVATE_KEY` is used for the json web token received to authenticate to the API.  It is the file location on an OpenSSL private signing key.
+* `JWT_TOKEN_EXPIRATION` is the time limit a JWT is valid.  It is in the form of time-metric.  Ex: 2h for 2 hours, 55m for 55 minutes, etc.
 
 ## JWT Signing Key Setup
 
 ```
 $ cd keys/
-$ . gen_keys.sh
+$ ./gen_keys.sh
 ```
 
-## Starting the Application
+## Local Testing
 
-Buffalo ships with a command that will watch your application and automatically rebuild the Go binary and any assets for you. To do that run the "buffalo dev" command:
+Requirements:
 
-	$ buffalo dev
+* Postgres database
+* gcc
+* openssl
 
-If you point your browser to [http://127.0.0.1:3000](http://127.0.0.1:3000) you should see a "Welcome to Buffalo!" page.
+Starting the application:
 
-**Congratulations!** You now have your Buffalo application up and running.
+* buffalo dev
 
-## What Next?
+## Docker
 
-We recommend you heading over to [http://gobuffalo.io](http://gobuffalo.io) and reviewing all of the great documentation there.
+Requirements:
 
-Good luck!
+* docker
 
-[Powered by Buffalo](http://gobuffalo.io)
+## Docker Compose
+
+Requirements:
+
+* docker
+* docker-compose
+
+Starting the application:
+
+* docker-compose up
