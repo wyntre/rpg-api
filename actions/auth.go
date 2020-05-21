@@ -162,7 +162,5 @@ func checkToken(next buffalo.Handler) buffalo.Handler {
 			return c.Error(http.StatusInternalServerError, err)
 		}
 		return c.Error(http.StatusUnauthorized, errors.New("token revoked"))
-
-		return next(c)
 	}
 }
