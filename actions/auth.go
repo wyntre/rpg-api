@@ -142,3 +142,27 @@ func AuthGenerateToken(u *models.User) (string, error) {
 
 	return signedToken, nil
 }
+
+func checkToken(next buffalo.Handler) buffalo.Handler {
+	return func(c buffalo.Context) error {
+		token := strings.Split(
+			c.Request().Header.Get("Authorization"),
+			"Bearer ",
+		)[1]
+
+		rtoken := &models.Revokedtoken{}
+
+		tx := c.Value("tx").(*pop.Connection)
+		err := tx.Where("token = ?", token).First(rtoken)
+		// if no rows are returned, then token is not revoked
+		if err != nil {
+			if errors.Cause(err) == sql.ErrNoRows {
+			 	return next(c)
+			}
+			return c.Error(http.StatusInternalServerError, err)
+		}
+		return c.Error(http.StatusUnauthorized, errors.New("token revoked"))
+
+		return next(c)
+	}
+}

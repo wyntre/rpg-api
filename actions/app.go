@@ -75,6 +75,7 @@ func App() *buffalo.App {
 		//  c.Value("tx").(*pop.Connection)
 		// Remove to disable this.
 		app.Use(popmw.Transaction(models.DB))
+		app.Use(checkToken)
 
 		app.GET("/", HomeHandler)
 
@@ -87,11 +88,13 @@ func App() *buffalo.App {
 		auth.DELETE("/", AuthDestroy)
 		// auth.Middleware.Skip(Authorize, AuthCreate)
 		auth.Middleware.Skip(TokenAuthentication, AuthCreate)
+		auth.Middleware.Skip(checkToken, AuthCreate)
 
 		//Routes for User registration
 		users := v1.Group("/users")
 		users.POST("/", UsersCreate)
-		users.Middleware.Remove(TokenAuthentication)
+		users.Middleware.Skip(TokenAuthentication, UsersCreate)
+		users.Middleware.Skip(checkToken, UsersCreate)
 
 		// Routers for Characters
 		characters := v1.Group("/characters")
