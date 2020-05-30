@@ -30,4 +30,3 @@ database.yml
 database/dbdata/
 
 rpg.code-workspace
-migrations/schema.sql
