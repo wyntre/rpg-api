@@ -157,10 +157,10 @@ func checkToken(next buffalo.Handler) buffalo.Handler {
 		// if no rows are returned, then token is not revoked
 		if err != nil {
 			if errors.Cause(err) == sql.ErrNoRows {
-			 	return next(c)
+				return next(c)
 			}
 			return c.Error(http.StatusInternalServerError, err)
 		}
-		return c.Error(http.StatusUnauthorized, errors.New("token revoked"))
+		return c.Error(http.StatusUnauthorized, errors.New("token unauthorized"))
 	}
 }

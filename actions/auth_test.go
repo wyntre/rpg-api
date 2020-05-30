@@ -1,12 +1,12 @@
 package actions
 
 import (
-	"strings"
 	"net/http"
+	"strings"
 
+	"github.com/dgrijalva/jwt-go"
 	"github.com/gobuffalo/envy"
 	"github.com/wyntre/rpg_api/models"
-	"github.com/dgrijalva/jwt-go"
 )
 
 // test valid auth token generated
@@ -118,7 +118,7 @@ func (as *ActionSuite) Test_Auth_Revokation() {
 	req = as.JSON("/v1/auth")
 	req.Headers["Authorization"] = token
 	res = req.Delete()
-	as.Equal(http.StatusExpectationFailed, res.Code)
+	as.Equal(http.StatusUnauthorized, res.Code)
 }
 
 func (as *ActionSuite) Test_Auth_Revised_Token() {
