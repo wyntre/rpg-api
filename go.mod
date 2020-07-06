@@ -15,19 +15,16 @@ require (
 	github.com/gobuffalo/mw-paramlogger v1.0.0
 	github.com/gobuffalo/mw-tokenauth v1.0.0
 	github.com/gobuffalo/nulls v0.4.0
-	github.com/gobuffalo/pop v4.13.1+incompatible
 	github.com/gobuffalo/pop/v5 v5.0.11
 	github.com/gobuffalo/suite/v3 v3.0.0
 	github.com/gobuffalo/validate/v3 v3.3.0
 	github.com/gobuffalo/x v0.1.0
 	github.com/gofrs/uuid v3.2.0+incompatible
-	github.com/jackc/pgconn v1.5.0 // indirect
 	github.com/karrick/godirwalk v1.15.6 // indirect
 	github.com/markbates/grift v1.5.0
 	github.com/mattn/go-colorable v0.1.6 // indirect
 	github.com/pkg/errors v0.9.1
 	github.com/rs/cors v1.7.0
-	github.com/sirupsen/logrus v1.5.0 // indirect
 	github.com/spf13/cobra v1.0.0 // indirect
 	github.com/unrolled/secure v1.0.7
 	golang.org/x/crypto v0.0.0-20200420104511-884d27f42877
