@@ -27,3 +27,4 @@ generated/
 
 keys/*.pem
 rpg.code-workspace
+database.yml
