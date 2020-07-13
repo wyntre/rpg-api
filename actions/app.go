@@ -10,7 +10,7 @@ import (
 
 	"github.com/dgrijalva/jwt-go"
 	contenttype "github.com/gobuffalo/mw-contenttype"
-	"github.com/gobuffalo/mw-tokenauth"
+	tokenauth "github.com/gobuffalo/mw-tokenauth"
 	"github.com/gobuffalo/x/sessions"
 	"github.com/rs/cors"
 	"github.com/wyntre/rpg_api/models"
@@ -111,6 +111,7 @@ func App() *buffalo.App {
 		campaigns.GET("/show/{id}", campaignsResource.Show)
 		campaigns.PUT("/{id}", campaignsResource.Update)
 		campaigns.DELETE("/{id}", campaignsResource.Destroy)
+		// campaigns.GET("/{id}/quests", campaignsResource.Quests)
 
 		quests := v1.Group("/quests")
 		questsResource := QuestsResource{}
@@ -136,13 +137,21 @@ func App() *buffalo.App {
 		levels.PUT("/{id}", levelsResource.Update)
 		levels.DELETE("/{id}", levelsResource.Destroy)
 
-		tile_categories := v1.Group("/tile_categories")
-		tile_categoriesResource := TileCategoriesResource{}
-		tile_categories.GET("/", tile_categoriesResource.List)
-		tile_categories.POST("/new", tile_categoriesResource.Create)
-		tile_categories.GET("/show/{id}", tile_categoriesResource.Show)
-		tile_categories.PUT("/{id}", tile_categoriesResource.Update)
-		tile_categories.DELETE("/{id}", tile_categoriesResource.Destroy)
+		tileCategories := v1.Group("/tile_categories")
+		tileCategoriesResource := TileCategoriesResource{}
+		tileCategories.GET("/", tileCategoriesResource.List)
+		tileCategories.POST("/new", tileCategoriesResource.Create)
+		tileCategories.GET("/show/{id}", tileCategoriesResource.Show)
+		tileCategories.PUT("/{id}", tileCategoriesResource.Update)
+		tileCategories.DELETE("/{id}", tileCategoriesResource.Destroy)
+		tileCategories.GET("/{id}/tile_types", tileCategoriesResource.Types)
+
+		tileTypes := v1.Group("/tile_types")
+		tileTypesResource := TileTypesResource{}
+		tileTypes.POST("/new", tileTypesResource.Create)
+		tileTypes.GET("/{id}", tileTypesResource.Show)
+		tileTypes.PUT("/{id}", tileTypesResource.Update)
+		tileTypes.DELETE("/{id}", tileTypesResource.Destroy)
 	}
 
 	return app

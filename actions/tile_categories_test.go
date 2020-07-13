@@ -1,8 +1,9 @@
 package actions
 
 import (
-	"github.com/wyntre/rpg_api/models"
 	"net/http"
+
+	"github.com/wyntre/rpg_api/models"
 )
 
 type CreateTileCategoryRequest struct {
@@ -14,7 +15,7 @@ type TileCategoriesListResponse struct {
 }
 
 func (as *ActionSuite) CreateTileCategory(name string, token string) *models.TileCategory {
-	// create quest
+	// create Tile Category
 	tileCategoryRequest := &CreateTileCategoryRequest{
 		Name: name,
 	}
@@ -34,7 +35,7 @@ func (as *ActionSuite) CreateTileCategory(name string, token string) *models.Til
 func (as *ActionSuite) Test_TileCategories_Create() {
 	token := as.CreateUser("test@test.com", "test")
 
-	// create quest
+	// create Tile Category
 	tileCategoryRequest := &CreateTileCategoryRequest{
 		Name: "Test TileCategory",
 	}
@@ -52,7 +53,7 @@ func (as *ActionSuite) Test_TileCategories_Create() {
 func (as *ActionSuite) Test_TileCategories_Create_Fail() {
 	token := as.CreateUser("test@test.com", "test")
 
-	// without description
+	// without name
 	tileCategoryRequest := &CreateTileCategoryRequest{}
 
 	req := as.JSON("/v1/tile_categories/new")
@@ -110,7 +111,7 @@ func (as *ActionSuite) Test_TileCategories_Destroy() {
 	req = as.JSON("/v1/tile_categories/" + tc.ID.String())
 	req.Headers["Authorization"] = token
 	res = req.Delete()
-	as.Equal(http.StatusOK, res.Code)
+	as.Equal(http.StatusAccepted, res.Code)
 
 	req = as.JSON("/v1/tile_categories/show/" + tc.ID.String())
 	req.Headers["Authorization"] = token
@@ -160,7 +161,7 @@ func (as *ActionSuite) Test_TileCategories_Update() {
 	req := as.JSON("/v1/tile_categories/" + tc.ID.String())
 	req.Headers["Authorization"] = token
 	res := req.Put(tc)
-	as.Equal(http.StatusOK, res.Code)
+	as.Equal(http.StatusAccepted, res.Code)
 
 	test_level := &models.TileCategory{}
 	res.Bind(test_level)
