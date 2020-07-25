@@ -10,7 +10,7 @@ import (
 
 	"github.com/dgrijalva/jwt-go"
 	contenttype "github.com/gobuffalo/mw-contenttype"
-	"github.com/gobuffalo/mw-tokenauth"
+	tokenauth "github.com/gobuffalo/mw-tokenauth"
 	"github.com/gobuffalo/x/sessions"
 	"github.com/rs/cors"
 	"github.com/wyntre/rpg_api/models"
@@ -101,45 +101,66 @@ func App() *buffalo.App {
 		characters.PUT("/{id}", CharactersUpdate)
 		characters.DELETE("/{id}", CharactersDestroy)
 
-		campaigns := v1.Group("/campaigns")
+		// Assign Campaign Resources
 		campaignsResource := CampaignsResource{}
+		questsResource := QuestsResource{}
+		mapsResource := MapsResource{}
+		levelsResource := LevelsResource{}
+		tilesResource := TilesResource{}
+
+		// Assign Tile Resources
+		tileCategoriesResource := TileCategoriesResource{}
+		tileTypesResource := TileTypesResource{}
+
+		// Routers for Campagins
+		campaigns := v1.Group("/campaigns")
 		campaigns.GET("/", campaignsResource.List)
 		campaigns.POST("/new", campaignsResource.Create)
-		campaigns.GET("/show/{id}", campaignsResource.Show)
+		campaigns.GET("/{id}", campaignsResource.Show)
 		campaigns.PUT("/{id}", campaignsResource.Update)
 		campaigns.DELETE("/{id}", campaignsResource.Destroy)
+		campaigns.GET("/{id}/quests", questsResource.List)
 
 		quests := v1.Group("/quests")
-		questsResource := QuestsResource{}
-		quests.GET("/{id}", questsResource.List)
 		quests.POST("/new", questsResource.Create)
-		quests.GET("/show/{id}", questsResource.Show)
+		quests.GET("/{id}", questsResource.Show)
 		quests.PUT("/{id}", questsResource.Update)
 		quests.DELETE("/{id}", questsResource.Destroy)
+		quests.GET("/{id}/maps", mapsResource.List)
 
 		maps := v1.Group("/maps")
-		mapsResource := MapsResource{}
-		maps.GET("/{id}", mapsResource.List)
 		maps.POST("/new", mapsResource.Create)
-		maps.GET("/show/{id}", mapsResource.Show)
+		maps.GET("/{id}", mapsResource.Show)
 		maps.PUT("/{id}", mapsResource.Update)
 		maps.DELETE("/{id}", mapsResource.Destroy)
+		maps.GET("/{id}/levels", levelsResource.List)
 
 		levels := v1.Group("/levels")
-		levelsResource := LevelsResource{}
-		levels.GET("/{id}", levelsResource.List)
 		levels.POST("/new", levelsResource.Create)
-		levels.GET("/show/{id}", levelsResource.Show)
+		levels.GET("/{id}", levelsResource.Show)
 		levels.PUT("/{id}", levelsResource.Update)
 		levels.DELETE("/{id}", levelsResource.Destroy)
+		levels.GET("/{id}/tiles", tilesResource.List)
 
-		tile_categories := v1.Group("/tile_categories")
-		tile_categoriesResource := TileCategoriesResource{}
-		tile_categories.GET("/", tile_categoriesResource.List)
-		tile_categories.POST("/new", tile_categoriesResource.Create)
-		tile_categories.GET("/show/{id}", tile_categoriesResource.Show)
-		tile_categories.PUT("/{id}", tile_categoriesResource.Update)
-		tile_categories.DELETE("/{id}", tile_categoriesResource.Destroy)
+		tiles := v1.Group("/tiles")
+		tiles.POST("/new", tilesResource.Create)
+		tiles.GET("/{id}", tilesResource.Show)
+		tiles.PUT("/{id}", tilesResource.Update)
+		tiles.DELETE("/{id}", tilesResource.Destroy)
+
+		tileCategories := v1.Group("/tile_categories")
+		tileCategories.GET("/", tileCategoriesResource.List)
+		tileCategories.POST("/new", tileCategoriesResource.Create)
+		tileCategories.GET("/{id}", tileCategoriesResource.Show)
+		tileCategories.PUT("/{id}", tileCategoriesResource.Update)
+		tileCategories.DELETE("/{id}", tileCategoriesResource.Destroy)
+		tileCategories.GET("/{id}/tile_types", tileTypesResource.List)
+
+		tileTypes := v1.Group("/tile_types")
+		tileTypes.POST("/new", tileTypesResource.Create)
+		tileTypes.GET("/{id}", tileTypesResource.Show)
+		tileTypes.PUT("/{id}", tileTypesResource.Update)
+		tileTypes.DELETE("/{id}", tileTypesResource.Destroy)
 	}
 
 	return app
