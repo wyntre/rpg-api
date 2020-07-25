@@ -1,9 +1,10 @@
 package actions
 
 import (
+	"net/http"
+
 	"github.com/gofrs/uuid"
 	"github.com/wyntre/rpg_api/models"
-	"net/http"
 )
 
 type CreateMapRequest struct {
@@ -13,15 +14,15 @@ type CreateMapRequest struct {
 }
 
 type MapsListResponse struct {
-	Maps models.Maps `json:maps`
+	Maps models.Maps `json:"maps"`
 }
 
-func (as *ActionSuite) CreateMap(name string, description string, quest_id uuid.UUID, token string) *models.Map {
+func (as *ActionSuite) CreateMap(name string, description string, questID uuid.UUID, token string) *models.Map {
 	// create quest
 	mapRequest := &CreateMapRequest{
 		Name:        name,
 		Description: description,
-		QuestID:     quest_id,
+		QuestID:     questID,
 	}
 
 	req := as.JSON("/v1/maps/new")
@@ -29,11 +30,11 @@ func (as *ActionSuite) CreateMap(name string, description string, quest_id uuid.
 	res := req.Post(mapRequest)
 	as.Equal(http.StatusCreated, res.Code)
 
-	rpg_map := &models.Map{}
-	res.Bind(rpg_map)
-	as.NotNil(rpg_map)
+	rpgMap := &models.Map{}
+	res.Bind(rpgMap)
+	as.NotNil(rpgMap)
 
-	return rpg_map
+	return rpgMap
 }
 
 func (as *ActionSuite) Test_Maps_Create() {
@@ -54,9 +55,9 @@ func (as *ActionSuite) Test_Maps_Create() {
 	res := req.Post(mapRequest)
 	as.Equal(http.StatusCreated, res.Code)
 
-	rpg_map := &models.Map{}
-	res.Bind(rpg_map)
-	as.NotNil(rpg_map)
+	rpgMap := &models.Map{}
+	res.Bind(rpgMap)
+	as.NotNil(rpgMap)
 }
 
 func (as *ActionSuite) Test_Maps_Create_Fail() {
@@ -117,15 +118,15 @@ func (as *ActionSuite) Test_Maps_Show() {
 	q := as.CreateQuest("Test Quest", "Test Quest Description", c.ID, token)
 	m := as.CreateMap("Test Map", "Test Map Description", q.ID, token)
 
-	req := as.JSON("/v1/maps/show/" + m.ID.String())
+	req := as.JSON("/v1/maps/" + m.ID.String())
 	req.Headers["Authorization"] = token
 	res := req.Get()
 	as.Equal(http.StatusOK, res.Code)
 
-	test_quest := &models.Map{}
-	res.Bind(test_quest)
-	as.Equal(m.ID, test_quest.ID)
-	as.Equal(m.Name, test_quest.Name)
+	testQuest := &models.Map{}
+	res.Bind(testQuest)
+	as.Equal(m.ID, testQuest.ID)
+	as.Equal(m.Name, testQuest.Name)
 }
 
 func (as *ActionSuite) Test_Maps_Show_Fail() {
@@ -206,7 +207,7 @@ func (as *ActionSuite) Test_Maps_List() {
 	as.CreateMap("Test Map 2", "Test Map Description", q.ID, token)
 
 	clr := &MapsListResponse{}
-	req := as.JSON("/v1/maps/" + q.ID.String())
+	req := as.JSON("/v1/quests/" + q.ID.String() + "/maps")
 	req.Headers["Authorization"] = token
 	res := req.Get()
 	res.Bind(clr)
@@ -229,9 +230,9 @@ func (as *ActionSuite) Test_Maps_Update() {
 	res := req.Put(m)
 	as.Equal(http.StatusOK, res.Code)
 
-	test_map := &models.Map{}
-	res.Bind(test_map)
-	as.Equal("Fake Map", test_map.Name)
+	testMap := &models.Map{}
+	res.Bind(testMap)
+	as.Equal("Fake Map", testMap.Name)
 }
 
 func (as *ActionSuite) Test_Maps_Update_Fail() {

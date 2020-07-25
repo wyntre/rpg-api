@@ -1,9 +1,10 @@
 package actions
 
 import (
+	"net/http"
+
 	"github.com/gofrs/uuid"
 	"github.com/wyntre/rpg_api/models"
-	"net/http"
 )
 
 type CreateQuestRequest struct {
@@ -13,15 +14,15 @@ type CreateQuestRequest struct {
 }
 
 type QuestsListResponse struct {
-	Quests models.Quests `json:quests`
+	Quests models.Quests `json:"quests"`
 }
 
-func (as *ActionSuite) CreateQuest(name string, description string, campaign_id uuid.UUID, token string) *models.Quest {
+func (as *ActionSuite) CreateQuest(name string, description string, campaignID uuid.UUID, token string) *models.Quest {
 	// create quest
 	questRequest := &CreateQuestRequest{
 		Name:        "Test Quest",
 		Description: "This is a test quest.",
-		CampaignID:  campaign_id,
+		CampaignID:  campaignID,
 	}
 
 	req := as.JSON("/v1/quests/new")
@@ -115,15 +116,15 @@ func (as *ActionSuite) Test_Quests_Show() {
 
 	quest := as.CreateQuest("Test Quest", "Test Quest Description", campaign.ID, token)
 
-	req := as.JSON("/v1/quests/show/" + quest.ID.String())
+	req := as.JSON("/v1/quests/" + quest.ID.String())
 	req.Headers["Authorization"] = token
 	res := req.Get()
 	as.Equal(http.StatusOK, res.Code)
 
-	test_quest := &models.Quest{}
-	res.Bind(test_quest)
-	as.Equal(quest.ID, test_quest.ID)
-	as.Equal(quest.Name, test_quest.Name)
+	testQuest := &models.Quest{}
+	res.Bind(testQuest)
+	as.Equal(quest.ID, testQuest.ID)
+	as.Equal(quest.Name, testQuest.Name)
 }
 
 func (as *ActionSuite) Test_Quests_Show_Fail() {
@@ -200,7 +201,7 @@ func (as *ActionSuite) Test_Quests_List() {
 	as.CreateQuest("Test Quest 2", "Test Quest Description", campaign.ID, token)
 
 	clr := &QuestsListResponse{}
-	req := as.JSON("/v1/quests/" + campaign.ID.String())
+	req := as.JSON("/v1/campaigns/" + campaign.ID.String() + "/quests")
 	req.Headers["Authorization"] = token
 	res := req.Get()
 	res.Bind(clr)
@@ -222,9 +223,9 @@ func (as *ActionSuite) Test_Quests_Update() {
 	res := req.Put(quest)
 	as.Equal(http.StatusOK, res.Code)
 
-	test_quest := &models.Quest{}
-	res.Bind(test_quest)
-	as.Equal("Fake Quest", test_quest.Name)
+	testQuest := &models.Quest{}
+	res.Bind(testQuest)
+	as.Equal("Fake Quest", testQuest.Name)
 }
 
 func (as *ActionSuite) Test_Quests_Update_Fail() {

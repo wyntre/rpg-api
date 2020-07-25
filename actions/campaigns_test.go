@@ -1,8 +1,9 @@
 package actions
 
 import (
-	"github.com/wyntre/rpg_api/models"
 	"net/http"
+
+	"github.com/wyntre/rpg_api/models"
 )
 
 type CreateCampaignRequest struct {
@@ -11,7 +12,7 @@ type CreateCampaignRequest struct {
 }
 
 type CampaignsListResponse struct {
-	Campaigns models.Campaigns `json:campaigns`
+	Campaigns models.Campaigns `json:"campaigns"`
 }
 
 func (as *ActionSuite) CreateCampaign(name string, description string, token string) *models.Campaign {
@@ -92,15 +93,15 @@ func (as *ActionSuite) Test_Campaigns_Show() {
 	res.Bind(campaign)
 	as.NotNil(campaign)
 
-	req = as.JSON("/v1/campaigns/show/" + campaign.ID.String())
+	req = as.JSON("/v1/campaigns/" + campaign.ID.String())
 	req.Headers["Authorization"] = token
 	res = req.Get()
 	as.Equal(http.StatusOK, res.Code)
 
-	test_campaign := &models.Campaign{}
-	res.Bind(test_campaign)
-	as.Equal(campaign.ID, test_campaign.ID)
-	as.Equal(campaign.Name, test_campaign.Name)
+	testCampaign := &models.Campaign{}
+	res.Bind(testCampaign)
+	as.Equal(campaign.ID, testCampaign.ID)
+	as.Equal(campaign.Name, testCampaign.Name)
 }
 
 func (as *ActionSuite) Test_Campaigns_Show_Fail() {
@@ -258,9 +259,9 @@ func (as *ActionSuite) Test_Campaigns_Update() {
 	res = req.Put(campaign)
 	as.Equal(http.StatusOK, res.Code)
 
-	test_campaign := &models.Campaign{}
-	res.Bind(test_campaign)
-	as.Equal("Fake Campaign", test_campaign.Name)
+	testCampaign := &models.Campaign{}
+	res.Bind(testCampaign)
+	as.Equal("Fake Campaign", testCampaign.Name)
 }
 
 func (as *ActionSuite) Test_Campaigns_Update_Fail() {

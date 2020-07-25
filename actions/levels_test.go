@@ -1,9 +1,10 @@
 package actions
 
 import (
+	"net/http"
+
 	"github.com/gofrs/uuid"
 	"github.com/wyntre/rpg_api/models"
-	"net/http"
 )
 
 type CreateLevelRequest struct {
@@ -13,15 +14,15 @@ type CreateLevelRequest struct {
 }
 
 type LevelsListResponse struct {
-	Levels models.Levels `json:levels`
+	Levels models.Levels `json:"levels"`
 }
 
-func (as *ActionSuite) CreateLevel(name string, description string, map_id uuid.UUID, token string) *models.Level {
+func (as *ActionSuite) CreateLevel(name string, description string, mapID uuid.UUID, token string) *models.Level {
 	// create quest
 	levelRequest := &CreateLevelRequest{
 		Name:        name,
 		Description: description,
-		MapID:       map_id,
+		MapID:       mapID,
 	}
 
 	req := as.JSON("/v1/levels/new")
@@ -120,15 +121,15 @@ func (as *ActionSuite) Test_Levels_Show() {
 	m := as.CreateMap("Test Map", "Test Map Description", q.ID, token)
 	l := as.CreateLevel("Test Level", "Test Level Description", m.ID, token)
 
-	req := as.JSON("/v1/levels/show/" + l.ID.String())
+	req := as.JSON("/v1/levels/" + l.ID.String())
 	req.Headers["Authorization"] = token
 	res := req.Get()
 	as.Equal(http.StatusOK, res.Code)
 
-	test_quest := &models.Level{}
-	res.Bind(test_quest)
-	as.Equal(l.ID, test_quest.ID)
-	as.Equal(l.Name, test_quest.Name)
+	testQuest := &models.Level{}
+	res.Bind(testQuest)
+	as.Equal(l.ID, testQuest.ID)
+	as.Equal(l.Name, testQuest.Name)
 }
 
 func (as *ActionSuite) Test_Levels_Show_Fail() {
@@ -213,7 +214,7 @@ func (as *ActionSuite) Test_Levels_List() {
 	as.CreateLevel("Test Level 2", "Test Level Description", m.ID, token)
 
 	clr := &LevelsListResponse{}
-	req := as.JSON("/v1/levels/" + m.ID.String())
+	req := as.JSON("/v1/maps/" + m.ID.String() + "/levels")
 	req.Headers["Authorization"] = token
 	res := req.Get()
 	res.Bind(clr)
@@ -237,9 +238,9 @@ func (as *ActionSuite) Test_Levels_Update() {
 	res := req.Put(l)
 	as.Equal(http.StatusOK, res.Code)
 
-	test_level := &models.Level{}
-	res.Bind(test_level)
-	as.Equal("Fake Level", test_level.Name)
+	testLevel := &models.Level{}
+	res.Bind(testLevel)
+	as.Equal("Fake Level", testLevel.Name)
 }
 
 func (as *ActionSuite) Test_Levels_Update_Fail() {

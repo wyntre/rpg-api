@@ -1,12 +1,13 @@
 package actions
 
 import (
-	"github.com/wyntre/rpg_api/models"
 	"net/http"
+
+	"github.com/wyntre/rpg_api/models"
 )
 
 type CreateTileCategoryRequest struct {
-	Name        string    `json:"name"`
+	Name string `json:"name"`
 }
 
 type TileCategoriesListResponse struct {
@@ -16,7 +17,7 @@ type TileCategoriesListResponse struct {
 func (as *ActionSuite) CreateTileCategory(name string, token string) *models.TileCategory {
 	// create quest
 	tileCategoryRequest := &CreateTileCategoryRequest{
-		Name:        name,
+		Name: name,
 	}
 
 	req := as.JSON("/v1/tile_categories/new")
@@ -36,7 +37,7 @@ func (as *ActionSuite) Test_TileCategories_Create() {
 
 	// create quest
 	tileCategoryRequest := &CreateTileCategoryRequest{
-		Name:        "Test TileCategory",
+		Name: "Test TileCategory",
 	}
 
 	req := as.JSON("/v1/tile_categories/new")
@@ -63,7 +64,7 @@ func (as *ActionSuite) Test_TileCategories_Create_Fail() {
 
 func (as *ActionSuite) Test_TileCategories_Create_No_Token() {
 	tileCategoryRequest := &CreateTileCategoryRequest{
-		Name:        "Test TileCategory",
+		Name: "Test TileCategory",
 	}
 
 	req := as.JSON("/v1/tile_categories/new")
@@ -74,17 +75,17 @@ func (as *ActionSuite) Test_TileCategories_Create_No_Token() {
 func (as *ActionSuite) Test_TileCategories_Show() {
 	token := as.CreateUser("test@test.com", "test")
 
-  tc := as.CreateTileCategory("Test TileCategory", token)
+	tc := as.CreateTileCategory("Test TileCategory", token)
 
-	req := as.JSON("/v1/tile_categories/show/" + tc.ID.String())
+	req := as.JSON("/v1/tile_categories/" + tc.ID.String())
 	req.Headers["Authorization"] = token
 	res := req.Get()
 	as.Equal(http.StatusOK, res.Code)
 
-	test_category := &models.TileCategory{}
-	res.Bind(test_category)
-	as.Equal(tc.ID, test_category.ID)
-	as.Equal(tc.Name, test_category.Name)
+	testCategory := &models.TileCategory{}
+	res.Bind(testCategory)
+	as.Equal(tc.ID, testCategory.ID)
+	as.Equal(tc.Name, testCategory.Name)
 }
 
 func (as *ActionSuite) Test_TileCategories_Show_Fail() {
@@ -99,9 +100,9 @@ func (as *ActionSuite) Test_TileCategories_Show_Fail() {
 func (as *ActionSuite) Test_TileCategories_Destroy() {
 	token := as.CreateUser("test@test.com", "test")
 
-  tc := as.CreateTileCategory("Test TileCategory", token)
+	tc := as.CreateTileCategory("Test TileCategory", token)
 
-  req := as.JSON("/v1/tile_categories/show/" + tc.ID.String())
+	req := as.JSON("/v1/tile_categories/" + tc.ID.String())
 	req.Headers["Authorization"] = token
 	res := req.Get()
 	as.Equal(http.StatusOK, res.Code)
@@ -112,7 +113,7 @@ func (as *ActionSuite) Test_TileCategories_Destroy() {
 	res = req.Delete()
 	as.Equal(http.StatusOK, res.Code)
 
-  req = as.JSON("/v1/tile_categories/show/" + tc.ID.String())
+	req = as.JSON("/v1/tile_categories/" + tc.ID.String())
 	req.Headers["Authorization"] = token
 	res = req.Get()
 	as.Equal(http.StatusNotFound, res.Code)
@@ -137,8 +138,8 @@ func (as *ActionSuite) Test_TileCategories_Destroy_Fail() {
 func (as *ActionSuite) Test_TileCategories_List() {
 	token := as.CreateUser("test@test.com", "test")
 
-  as.CreateTileCategory("Test TileCategory", token)
-  as.CreateTileCategory("Test TileCategory2", token)
+	as.CreateTileCategory("Test TileCategory", token)
+	as.CreateTileCategory("Test TileCategory2", token)
 
 	clr := &TileCategoriesListResponse{}
 	req := as.JSON("/v1/tile_categories")
@@ -153,7 +154,7 @@ func (as *ActionSuite) Test_TileCategories_Update() {
 	// create valid user
 	token := as.CreateUser("test@test.com", "test")
 
-  tc := as.CreateTileCategory("Test TileCategory", token)
+	tc := as.CreateTileCategory("Test TileCategory", token)
 
 	tc.Name = "Fake TileCategory"
 
@@ -162,9 +163,9 @@ func (as *ActionSuite) Test_TileCategories_Update() {
 	res := req.Put(tc)
 	as.Equal(http.StatusOK, res.Code)
 
-	test_level := &models.TileCategory{}
-	res.Bind(test_level)
-	as.Equal("Fake TileCategory", test_level.Name)
+	testLevel := &models.TileCategory{}
+	res.Bind(testLevel)
+	as.Equal("Fake TileCategory", testLevel.Name)
 }
 
 func (as *ActionSuite) Test_TileCategories_Update_Fail() {

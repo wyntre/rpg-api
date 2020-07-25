@@ -5,7 +5,7 @@ import (
 )
 
 func (ms *ModelSuite) CreateMap(u4 uuid.UUID, name string, description string, q4 uuid.UUID, so int) *Map {
-	rpg_map := &Map{
+	rpgMap := &Map{
 		UserID:      u4,
 		Name:        name,
 		Description: description,
@@ -13,11 +13,11 @@ func (ms *ModelSuite) CreateMap(u4 uuid.UUID, name string, description string, q
 		SortOrder:   so,
 	}
 
-	verrs, err := ms.DB.ValidateAndCreate(rpg_map)
+	verrs, err := ms.DB.ValidateAndCreate(rpgMap)
 	ms.NoError(err)
 	ms.False(verrs.HasAny())
 
-	return rpg_map
+	return rpgMap
 }
 
 func (ms *ModelSuite) Test_Map_Create() {
@@ -29,14 +29,14 @@ func (ms *ModelSuite) Test_Map_Create() {
 	c := ms.CreateCampaign(u.ID, "Test", "Test Description.")
 	q := ms.CreateQuest(u.ID, "Test Quest", "Test Quest Description", c.ID, 1)
 
-	rpg_map := ms.CreateMap(
+	rpgMap := ms.CreateMap(
 		u.ID,
 		"Test",
 		"Test description.",
 		q.ID,
 		1,
 	)
-	ms.NotNil(rpg_map.ID)
+	ms.NotNil(rpgMap.ID)
 
 	count, err = ms.DB.Count("maps")
 	ms.NoError(err)
@@ -53,9 +53,9 @@ func (ms *ModelSuite) Test_Map_ValidationErrors() {
 	q := ms.CreateQuest(u.ID, "Test Quest", "Test Quest Description", c.ID, 1)
 
 	// test empty map
-	rpg_map := &Map{}
+	rpgMap := &Map{}
 
-	verrs, err := ms.DB.ValidateAndCreate(rpg_map)
+	verrs, err := ms.DB.ValidateAndCreate(rpgMap)
 	ms.NoError(err)
 	ms.True(verrs.HasAny())
 
@@ -64,14 +64,14 @@ func (ms *ModelSuite) Test_Map_ValidationErrors() {
 	ms.Equal(0, count)
 
 	// test missing UserID
-	rpg_map = &Map{
+	rpgMap = &Map{
 		Name:        "Test Map",
 		Description: "Test Description",
 		QuestID:     q.ID,
 		SortOrder:   1,
 	}
 
-	verrs, err = ms.DB.ValidateAndCreate(rpg_map)
+	verrs, err = ms.DB.ValidateAndCreate(rpgMap)
 	ms.NoError(err)
 	ms.True(verrs.HasAny())
 
@@ -80,14 +80,14 @@ func (ms *ModelSuite) Test_Map_ValidationErrors() {
 	ms.Equal(0, count)
 
 	// test missing Name
-	rpg_map = &Map{
+	rpgMap = &Map{
 		UserID:      u.ID,
 		Description: "Test Description",
 		QuestID:     q.ID,
 		SortOrder:   1,
 	}
 
-	verrs, err = ms.DB.ValidateAndCreate(rpg_map)
+	verrs, err = ms.DB.ValidateAndCreate(rpgMap)
 	ms.NoError(err)
 	ms.True(verrs.HasAny())
 
@@ -96,14 +96,14 @@ func (ms *ModelSuite) Test_Map_ValidationErrors() {
 	ms.Equal(0, count)
 
 	// test missing Description
-	rpg_map = &Map{
+	rpgMap = &Map{
 		UserID:    u.ID,
 		Name:      "Test Map",
 		QuestID:   q.ID,
 		SortOrder: 1,
 	}
 
-	verrs, err = ms.DB.ValidateAndCreate(rpg_map)
+	verrs, err = ms.DB.ValidateAndCreate(rpgMap)
 	ms.NoError(err)
 	ms.True(verrs.HasAny())
 
@@ -112,14 +112,14 @@ func (ms *ModelSuite) Test_Map_ValidationErrors() {
 	ms.Equal(0, count)
 
 	// test missing QuestID
-	rpg_map = &Map{
+	rpgMap = &Map{
 		UserID:      u.ID,
 		Name:        "Test Map",
 		Description: "Test Description",
 		SortOrder:   1,
 	}
 
-	verrs, err = ms.DB.ValidateAndCreate(rpg_map)
+	verrs, err = ms.DB.ValidateAndCreate(rpgMap)
 	ms.NoError(err)
 	ms.True(verrs.HasAny())
 
@@ -128,14 +128,14 @@ func (ms *ModelSuite) Test_Map_ValidationErrors() {
 	ms.Equal(0, count)
 
 	// test missing SortOrder
-	rpg_map = &Map{
+	rpgMap = &Map{
 		UserID:      u.ID,
 		Name:        "Test Map",
 		Description: "Test Description",
 		QuestID:     q.ID,
 	}
 
-	verrs, err = ms.DB.ValidateAndCreate(rpg_map)
+	verrs, err = ms.DB.ValidateAndCreate(rpgMap)
 	ms.NoError(err)
 	ms.True(verrs.HasAny())
 
