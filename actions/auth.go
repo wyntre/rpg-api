@@ -113,6 +113,10 @@ func AuthDestroy(c buffalo.Context) error {
 	}))
 }
 
+// AuthGenerateToken generates a JWT for a given user
+//
+// Input: User interface
+// Return: JWT string, error
 func AuthGenerateToken(u *models.User) (string, error) {
 	privateKey := envy.Get("JWT_PRIVATE_KEY", "keys/rsakey.pem")
 	key, err := ioutil.ReadFile(privateKey)

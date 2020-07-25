@@ -2,11 +2,12 @@ package models
 
 import (
 	"encoding/json"
+	"time"
+
 	"github.com/gobuffalo/pop/v5"
 	"github.com/gobuffalo/validate/v3"
 	"github.com/gobuffalo/validate/v3/validators"
 	"github.com/gofrs/uuid"
-	"time"
 )
 
 // Tile is used by pop to map your .model.Name.Proper.Pluralize.Underscore database table to your go code.
@@ -17,7 +18,7 @@ type Tile struct {
 	Level      *Level    `json:"level,omitempty" belongs_to:"level"`
 	X          int       `json:"x" db:"x"`
 	Y          int       `json:"y" db:"y"`
-	TileTypeID uuid.UUID `json:"-" db:"tile_type_id"`
+	TileTypeID uuid.UUID `json:"tile_type_id" db:"tile_type_id"`
 	TileType   *TileType `json:"tile_type" belongs_to:"tile_type"`
 	CreatedAt  time.Time `json:"created_at" db:"created_at"`
 	UpdatedAt  time.Time `json:"updated_at" db:"updated_at"`

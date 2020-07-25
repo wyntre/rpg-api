@@ -27,6 +27,30 @@ type TileTypesResource struct {
 	buffalo.Resource
 }
 
+// List gets the tile types for a tile category
+func (v TileTypesResource) List(c buffalo.Context) error {
+	tileCategoryID, err := uuid.FromString(c.Param("id"))
+	if err != nil {
+		return c.Error(http.StatusInternalServerError, errors.New("bad tile category id"))
+	}
+
+	// Get the DB connection from the context
+	tx, ok := c.Value("tx").(*pop.Connection)
+	if !ok {
+		return errors.New("no transaction found")
+	}
+
+	tileCategory := &models.TileCategory{}
+
+	if err := tx.Eager().Find(tileCategory, tileCategoryID); err != nil {
+		return c.Error(http.StatusNotFound, errors.New("tile category not found"))
+	}
+
+	return c.Render(http.StatusOK, r.JSON(map[string]models.TileTypes{
+		"tile_types": tileCategory.TileTypes,
+	}))
+}
+
 // Show gets the data for one TileType. This function is tileTypeped to
 // the path GET /tileTypes/{tileTypeID}
 func (v TileTypesResource) Show(c buffalo.Context) error {

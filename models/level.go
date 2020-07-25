@@ -2,11 +2,12 @@ package models
 
 import (
 	"encoding/json"
+	"time"
+
 	"github.com/gobuffalo/pop/v5"
 	"github.com/gobuffalo/validate/v3"
 	"github.com/gobuffalo/validate/v3/validators"
 	"github.com/gofrs/uuid"
-	"time"
 )
 
 // Level is used by pop to map your .model.Name.Proper.Pluralize.Underscore database table to your go code.
@@ -17,6 +18,7 @@ type Level struct {
 	Description string    `json:"description" db:"description"`
 	MapID       uuid.UUID `json:"map_id" db:"map_id"`
 	Map         *Map      `json:"map,omitempty" belongs_to:"map"`
+	Tiles       Tiles     `json:"tiles,omitempty" has_many:"tiles" order_by:"x, y asc"`
 	CreatedAt   time.Time `json:"created_at" db:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at" db:"updated_at"`
 	SortOrder   int       `json:"sort_order" db:"sort_order"`
