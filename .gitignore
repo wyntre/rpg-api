@@ -28,3 +28,5 @@ generated/
 keys/*.pem
 database.yml
 database/dbdata/
+
+*.code-workspace
