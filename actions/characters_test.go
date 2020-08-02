@@ -7,13 +7,13 @@ import (
 )
 
 type CharactersListResponse struct {
-	Characters models.Characters `json:characters`
+	Characters models.Characters `json:"characters"`
 }
 
 type BadCharacter struct {
-	Name        string `json:name`
-	Description string `json:description`
-	ExtraData   string `json:extradata`
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	ExtraData   string `json:"extradata"`
 }
 
 func (as *ActionSuite) Test_Characters_Create() {
@@ -167,9 +167,9 @@ func (as *ActionSuite) Test_Characters_Show() {
 	as.Equal(http.StatusOK, res.Code)
 
 	// test for character id
-	test_character := &models.Character{}
-	res.Bind(test_character)
-	as.NotNil(test_character.ID)
+	testCharacter := &models.Character{}
+	res.Bind(testCharacter)
+	as.NotNil(testCharacter.ID)
 }
 
 func (as *ActionSuite) Test_Characters_Show_Fail() {
@@ -250,9 +250,9 @@ func (as *ActionSuite) Test_Characters_Update() {
 	res = req.Put(character)
 	as.Equal(http.StatusOK, res.Code)
 
-	test_character := &models.Character{}
-	res.Bind(test_character)
-	as.Equal("fake", test_character.Name)
+	testCharacter := &models.Character{}
+	res.Bind(testCharacter)
+	as.Equal("fake", testCharacter.Name)
 }
 
 func (as *ActionSuite) Test_Characters_Update_Fail() {

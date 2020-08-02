@@ -113,6 +113,9 @@ func AuthDestroy(c buffalo.Context) error {
 	}))
 }
 
+// AuthGenerateToken generates a JWT Auth Token
+// Expects a User object
+// Returns a JWT string and error
 func AuthGenerateToken(u *models.User) (string, error) {
 	privateKey := envy.Get("JWT_PRIVATE_KEY", "keys/rsakey.pem")
 	key, err := ioutil.ReadFile(privateKey)
@@ -157,10 +160,10 @@ func checkToken(next buffalo.Handler) buffalo.Handler {
 		// if no rows are returned, then token is not revoked
 		if err != nil {
 			if errors.Cause(err) == sql.ErrNoRows {
-			 	return next(c)
+				return next(c)
 			}
 			return c.Error(http.StatusInternalServerError, err)
 		}
-		return c.Error(http.StatusUnauthorized, errors.New("token revoked"))
+		return c.Error(http.StatusUnauthorized, errors.New("token unauthorized"))
 	}
 }

@@ -1,12 +1,12 @@
 package actions
 
 import (
-	"strings"
 	"net/http"
+	"strings"
 
+	"github.com/dgrijalva/jwt-go"
 	"github.com/gobuffalo/envy"
 	"github.com/wyntre/rpg_api/models"
-	"github.com/dgrijalva/jwt-go"
 )
 
 // test valid auth token generated
@@ -118,21 +118,21 @@ func (as *ActionSuite) Test_Auth_Revokation() {
 	req = as.JSON("/v1/auth")
 	req.Headers["Authorization"] = token
 	res = req.Delete()
-	as.Equal(http.StatusExpectationFailed, res.Code)
+	as.Equal(http.StatusUnauthorized, res.Code)
 }
 
 func (as *ActionSuite) Test_Auth_Revised_Token() {
 	token := as.CreateUser("test@test.com", "test")
 
 	// get claims from token
-	base64_claims := strings.Split(token, ".")
-	claims, err := jwt.DecodeSegment(base64_claims[1])
+	base64Claims := strings.Split(token, ".")
+	claims, err := jwt.DecodeSegment(base64Claims[1])
 	as.NoError(err)
 
 	// change claims
-	revised_claims := strings.Replace(string(claims), "id", "ids", 1)
-	base64_claims[1] = jwt.EncodeSegment([]byte(revised_claims))
-	token = strings.Join(base64_claims, ".")
+	revisedClaims := strings.Replace(string(claims), "id", "ids", 1)
+	base64Claims[1] = jwt.EncodeSegment([]byte(revisedClaims))
+	token = strings.Join(base64Claims, ".")
 
 	// auth'd request
 	req := as.JSON("/")

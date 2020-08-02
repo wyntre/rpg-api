@@ -1,0 +1,21 @@
+version: '3.3'
+
+services:
+  development:
+    image: postgres:alpine
+    restart: always
+    environment:
+      POSTGRES_USER: buffalo
+      POSTGRES_PASSWORD: buffalo
+      POSTGRES_DB: rpg_api_development
+    ports:
+      - 5432:5432
+  test:
+    image: postgres:alpine
+    restart: always
+    environment:
+      POSTGRES_USER: buffalo
+      POSTGRES_PASSWORD: buffalo
+      POSTGRES_DB: rpg_api_test
+    ports:
+      - 5433:5432
